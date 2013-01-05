@@ -1,0 +1,11 @@
+\chapter{Introduction}
+
+In this work, a new algorithm is suggested for solving geometric combinatorial problem, known as {\em floorplanning}. Simply said, the task is to place rectangles on a plane so that the area they take is as small as possible. This problem has many practical and theoretical applications.
+
+The new algorithm is based on an iterative stochastic algorithm which uses a genetic algorithm for local search on each iteration, because both algorithms have already proven useful for solving similar problems.
+
+The algorithm was implemented in the Java programming language and tested on standard benchmarks, available on a public website. The results are very good, compared to the state-of-the-art algorithms. The only weak point is the computational time. It takes much longer to get these results because of the evolutionary and stochastic nature of the algorithm. If one prefers quality to speed, the algorithm presented here is the choice. On the other hand, if the speed is crucial, another algorithm should be used.
+
+\section{Thesis Structure}
+
+The structure of the thesis is as follows. In Chapter~\ref{sec:problem}, the problem assignment is formulated formally and selected most used problem codings are introduced. In Chapter~\ref{sec:approach}, the new approach is proposed for solving the problem and described generally. In Chapter~\ref{sec:implementation}, the proposed algorithm implementation is described in detail, including UML class diagrams. In Chapter~\ref{sec:testing}, various experiments and benchmarks are summarized in tables, and the results are commented. In Section~\ref{sec:conclusions}, conclusions are made and further research suggested. Finally in Chapter~\ref{sec:usage}, the application of the resulting program by means of the command line is described.

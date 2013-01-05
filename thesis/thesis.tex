@@ -1,0 +1,160 @@
+% DIPLOMOVÁ PRÁCE
+% ===============
+
+\documentclass[11pt,twoside,a4paper]{book}
+\usepackage[a4paper,width=15cm,height=23cm,twoside]{geometry}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{subfig}
+\captionsetup{labelfont={bf},margin=8pt,captionskip=13pt}
+\usepackage[czech,english]{babel}
+\usepackage[calcwidth]{titlesec}
+\titleformat{\chapter}[display]{\normalfont\bf}{\titlerule[1pt]\vspace{1pt}\titlerule\vspace{1pc}\Huge\MakeUppercase{\chaptertitlename} \thechapter}{1pc}{\titlerule\vspace{1pc}\Huge}
+\titleformat{\section}[hang]{\normalfont\bf}{\color{Gray}\LARGE\thesection}{0pt}{\linebreak\LARGE\raggedright}[{\vspace{1ex}\titlerule}]
+\titleformat{\subsection}[hang]{\normalfont\bf}{\color{Gray}\large\thesubsection}{0pt}{\linebreak\Large\raggedright}[{\vspace{1ex}\titlerule}]
+\titleformat{\subsubsection}[hang]{\normalfont\sc\bf}{\color{Gray}\large\thesubsubsection}{0pt}{\linebreak\large\raggedright}[{\vspace{1ex}\titlerule\sc}]
+\usepackage{algorithmic}
+\algsetup{indent=1em}
+\usepackage{listings}
+\lstset{
+  columns=fullflexible,
+  language=Java,
+  numbers=left,
+  frame=leftline, 
+  rulesepcolor=\color{Gray},
+  basicstyle=\small,
+  numberstyle=\sc\footnotesize\color{Gray},
+  commentstyle=\it\footnotesize\color{Gray}
+}
+\usepackage[
+  pdftitle={Master's Thesis},
+  pdfauthor={Bc.~Vojtěch~Hordějčuk},
+  bookmarks=true,
+  colorlinks=true,
+  urlcolor=black,
+  citecolor=black,
+  linkcolor=black,
+  unicode=true
+]{hyperref}
+\pagestyle{empty}
+\setlength{\columnsep}{5pt}
+\linespread{1.1}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\parindent=1em
+\parskip=1em plus 1em minus 0.7em
+\def\MakeUppercase#1{{\it #1}}
+\graphicspath{{figures//}}
+
+\begin{document}
+
+% Titulní stránka
+% ===============
+
+\cleardoublepage
+
+\begin{center}
+
+{\large Czech Technical University in Prague \\
+Faculty of Electrical Engineering \\
+Department of Computer Science and Engineering}
+
+\vfill
+
+\includegraphics[width=0.6\paperwidth]{ctu.pdf}
+
+\vfill
+
+{\large MASTER THESIS}
+
+\vfill
+\hrule
+\vfill
+
+{\LARGE
+\bf Optimisation of Rectangular Shapes Placement \\
+by Means of Evolutionary Algorithms}
+
+{\LARGE Bc.~Vojtěch~Hordějčuk}
+
+\vfill
+
+{\em Supervisor}: {\small Ing.~Jiří~Kubalík,~Ph.D.}
+
+{\em Study~Programme}: {\small Elektrotechnika~a~informatika,~strukturovaný,~magisterský}
+
+{\em Field~of~Study}: {\small Výpočetní~technika, Softwarové~inženýrství}
+
+\vfill
+
+\today
+
+\end{center}
+
+% Poděkování a prohlášení
+% =======================
+
+\cleardoublepage
+\vspace*{\fill}
+
+\section*{Acknowledgements}
+
+My supervisor, Mr.~Ing.~Jiří~Kubalík~Ph.D., for valuable advice and research insight.
+
+\section*{Statement}
+
+I hereby declare that I have completed this thesis independently and that I have listed all the literature and publications used within the research and work. I have no objections to usage of this work in compliance with Act~No~121/2000 Sb. (the Copyright~Act), as amended, and in compliance with copyright-related rights currently in force.
+
+\bigskip
+\bigskip
+
+\noindent
+Prague, \today \hfill \hbox to 70mm{\tiny\dotfill}
+
+% Abstrakt
+% ========
+
+\cleardoublepage
+\vspace*{\fill}
+
+\section*{Abstract}
+
+The aim of this work is to design and test an evolutionary algorithm that is capable of placing rectangular shapes onto the plane that the rectangle containing all modules is as small as possible. Under this modelling, real problems are considered, such as VLSI chip floorplanning, simple task planning or civil engineering. An evolutionary algorithm is used to optimise the floorplan represented as a tree (B*-Tree).
+
+\section*{Abstrakt}
+
+Cílem práce bylo navrhnout a otestovat evoluční algoritmus, který bude schopný rozmístit obdélníkové útvary na plochu tak, aby celková plocha obdélníku, který tyto útvary ohraničuje, byla co nejmenší. Úlohou je možné modelovat různé problémy reálného světa - například rozmisťování funkčních bloků na VLSI čip (tzv. floorplanning), jednoduché plánování či urbanistiku. K optimalizaci je použit iterativní evoluční algoritmus, pracující se stromovou reprezentací (B*-Tree).
+
+% Obsah
+% =====
+
+\tableofcontents
+
+% Kapitoly
+% ========
+
+\cleardoublepage
+\setcounter{page}{1}
+\pagestyle{headings}
+\pagenumbering{arabic}
+
+\include{1_introduction}
+\include{2_problem}
+\include{3_approach}
+\include{4_implementation}
+\include{5_experiments}
+\include{6_userguide}
+\include{7_bibliography}
+
+% Seznamy obrázků a tabulek
+% =========================
+
+\listoffigures
+\listoftables
+
+% Konec dokumentu
+% ===============
+
+\end{document}

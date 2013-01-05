@@ -1,0 +1,22 @@
+graph {
+  ratio = 1;
+  node [fontsize=25];
+  margin = 0.01;
+  0 -- 1;
+  0 -- 2;
+  2 -- 3;
+  2 -- 4;
+  4 -- 5;
+  4 -- 6;
+  5 -- 7;
+  5 -- 8;
+  0 [label="+",shape=box];
+  1 [label="a"];
+  2 [label="-",shape=box];
+  3 [label="b"];
+  4 [label="+",shape=box];
+  5 [label="-",shape=box];
+  6 [label="e"];
+  7 [label="c"];
+  8 [label="d"];
+}

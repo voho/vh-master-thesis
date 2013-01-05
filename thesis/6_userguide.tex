@@ -1,0 +1,100 @@
+\chapter{Using of the Program}
+\label{sec:usage}
+
+\section{Command Line Usage}
+
+Program is distributed as a standalone console application that transforms input (problem assignment) into the output (problem solution). As the application is an experimental academic project only, it is aimed to be used by an experienced computer user via the console. Usage was tailored to support benchmarking easily.
+
+The program takes nine arguments and all of them are mandatory. If any argument is missing, program shows usage and exits. Table~\ref{tab:args} contains all the arguments with their descriptions as well as common values for convenience.
+
+The input directory must contain text files with benchmarks in the correct format (see further), the output directory must be writable. For each benchmark file, an output sub directory will be created that will be filled with the results, the statistic and with other information about the computation process. Most of the files created there are meant for testing or benchmarking purposes only. The most important file is the {\tt floorplan.svg}, that shows the final and best result found in the graphical form.
+
+\begin{verbatim}
+run.jar IN OUT VERBOSE R I G N S BESTFIT
+run.jar benchmark/ benchmark/result/ false 1 1000 500 5 50 true
+\end{verbatim}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Name & Description & Common value \\
+\hline
+\hline
+{\tt IN} & input directory name & benchmark/ \\
+\hline
+{\tt OUT} & output directory name & benchmark/result/ \\
+\hline
+{\tt VERBOSE} & verbose mode enabled & false \\
+\hline
+{\tt R} & number of runs for each benchmark & 1 \\
+\hline
+{\tt I} & iteration count & 1000 \\
+\hline
+{\tt G} & generation count & 500 \\
+\hline
+{\tt N} & niché count (same as action sequence length) & 5 \\
+\hline
+{\tt S} & niché size (same as number of individuals in niché) & 50 \\
+\hline
+{\tt BESTFIT} & best-fit prototype creation & true \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Program command line arguments}
+\label{tab:args}
+\end{table}
+
+\section{Benchmark File Format}
+
+This section describes how the benchmark files are written. All benchmarks were downloaded from the official website of the free Parquet placer \cite{bench} and the benchmark format was preserved unchanged for convenience.
+
+The benchmark file is a plain text file. The file starts with a single integer specifying the number of modules that are further specified in the file. Then the file continues with a sequence of float pairs split by a space which specifies the dimensions of individual modules. Although the dimensions are - in fact - real, they can be cast to integers, as their fraction parts are equal to zero.
+
+As an example, the whole MCNC HP benchmark is listed in Fig.~\ref{fig:hpcode}
+
+\begin{figure}
+\begin{minipage}{\textwidth}
+\begin{verbatim}
+11 
+1036.00 462.00 
+378.00 700.00 
+980.00 210.00 
+980.00 210.00 
+980.00 210.00 
+3304.00 546.00 
+3304.00 546.00 
+2016.00 252.00 
+3080.00 462.00 
+2016.00 252.00 
+3080.00 462.00 
+\end{verbatim}
+\end{minipage}
+\caption{HP benchmark plain text code}
+\label{fig:hpcode}
+\end{figure}
+
+\section{CD Contents}
+
+The included CD, there is a complete source code for both algorithm implementation and the thesis (for the Table of Contents, please refer to Table~\ref{tab:cd}). Basically, it is an snapshot image of the repository. In case that the CD is lost, source codes can be found on the internet. The website that hosts the complete project repository can be found here \cite{repository}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Name & Description \\
+\hline
+\hline
+{\tt benchmark/} & all collected benchmarks \\
+\hline
+{\tt src/} & program source code \\
+\hline
+{\tt test/} & program unit tests source code \\
+\hline
+{\tt thesis/} & thesis and figures source code \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Included CD disc contents}
+\label{tab:cd}
+\end{table}
