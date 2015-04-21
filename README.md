@@ -20,8 +20,8 @@ All command line arguments are mandatory:
 * number of test runs
 * iterations
 * generations
-* niché count (length of action sequences)
-* niché size (number of individuals in each population niché)
+* nichÃ© count (length of action sequences)
+* nichÃ© size (number of individuals in each population nichÃ©)
 * smart-fit prototype generated (true/false) 
 
 Usage example
@@ -30,6 +30,15 @@ Usage example
 ```bash
 java -jar program.jar benchmark/ benchmark/result/ true 5 1000 500 5 50 true
 ```
+
+Results by image
+----------------
+
+Here you can see some animated results!
+
+![n100](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n100loop.gif)
+![n200](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n200loop.gif)
+![n300](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n300loop.gif)
 
 Animated GIF creation
 ---------------------
