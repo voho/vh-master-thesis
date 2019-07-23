@@ -36,9 +36,8 @@ Results by image
 
 Here you can see some animated results!
 
-![n100](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n100loop.gif)
-![n200](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n200loop.gif)
-![n300](https://dl.dropboxusercontent.com/u/5942837/voho.cz/image-github/thesis/n300loop.gif)
+![n200](https://github.com/voho/vh-master-thesis/raw/master/presentation/n200loop.gif)
+![n300](https://github.com/voho/vh-master-thesis/raw/master/presentation/n300loop.gif)
 
 Animated GIF creation
 ---------------------
