@@ -11,6 +11,7 @@ import poems.action3.MoveNodePoemsAction;
 import program.Logger;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 
@@ -122,6 +123,28 @@ abstract public class AbstractPoemsAction
    * @return output tree
    */
   abstract protected BTree<NumberedValue<Module>> applyActive(final BTree<NumberedValue<Module>> input);
+  
+  /**
+   * Applies the action to the array B*-Tree (the tree is modified in place).
+   * The result is the same as when the action is applied to the immutable
+   * B*-Tree.
+   * 
+   * @param tree tree to modify
+   */
+  final public void apply(final ArrayBTree tree)
+  {
+    if (this.enabled)
+    {
+      this.applyActive(tree);
+    }
+  }
+  
+  /**
+   * Applies the action to the array B*-Tree (the tree is modified in place).
+   * 
+   * @param tree tree to modify
+   */
+  abstract protected void applyActive(final ArrayBTree tree);
   
   /**
    * Creates a random action based on this action.

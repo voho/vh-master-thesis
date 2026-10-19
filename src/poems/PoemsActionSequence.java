@@ -6,6 +6,7 @@ import module.Module;
 import program.Logger;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 
@@ -265,6 +266,15 @@ public class PoemsActionSequence extends AbstractPoemsAction
   public String toString()
   {
     return this.toActiveString();
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    for (final AbstractPoemsAction action : this.actions)
+    {
+      action.apply(tree);
+    }
   }
   
   @Override

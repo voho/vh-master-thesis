@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -111,5 +112,11 @@ public class MirrorPoemsAction extends AbstractPoemsAction
   public String toActiveString()
   {
     return String.format("mirror(%d,%s)", this.number, this.recursive);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.mirror(this.number, this.recursive, false);
   }
 }

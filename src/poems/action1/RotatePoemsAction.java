@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -101,5 +102,11 @@ public class RotatePoemsAction extends AbstractPoemsAction
         input.hasLeft()
             ? RotatePoemsAction.rotate(input.getLeft())
             : null);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.mirror(this.number, true, true);
   }
 }

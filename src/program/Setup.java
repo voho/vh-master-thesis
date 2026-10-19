@@ -49,6 +49,11 @@ public class Setup
    */
   public static final boolean MOVE_ACTION = Setup.flag("poems.move", false);
   /**
+   * evaluate the action sequences using the array B*-Tree (the results are
+   * the same, but the evaluation is much faster)
+   */
+  public static final boolean FAST_EVALUATION = Setup.flag("poems.fast", false);
+  /**
    * length of the late acceptance history; a worse prototype is accepted if it
    * is not worse than the prototype this number of iterations ago (0 = only
    * better or equal prototypes are accepted)

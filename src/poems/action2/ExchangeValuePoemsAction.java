@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -123,5 +124,11 @@ public class ExchangeValuePoemsAction extends AbstractPoemsAction
                 a,
                 b)
             : null);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.exchangeValues(this.node1, this.node2);
   }
 }

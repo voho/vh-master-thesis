@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -109,5 +110,11 @@ public class FlipPoemsAction extends AbstractPoemsAction
                 recursive,
                 flipNow || wasFlipped)
             : null);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.flip(this.number, this.recursive);
   }
 }

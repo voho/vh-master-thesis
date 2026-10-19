@@ -5,6 +5,7 @@ import module.PlacedModule;
 import poems.PoemsActionSequence;
 import poems.PoemsActionSequencePair;
 import program.Logger;
+import program.Setup;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Evaluator;
@@ -30,9 +31,13 @@ public class Individual
    */
   private final PoemsActionSequence sequence;
   /**
-   * B*-Tree of unplaced modules
+   * prototype (B*-Tree the action sequence is applied to)
    */
-  private final BTree<NumberedValue<Module>> buildPlan;
+  private final BTree<NumberedValue<Module>> prototype;
+  /**
+   * B*-Tree of unplaced modules (created on demand)
+   */
+  private BTree<NumberedValue<Module>> buildPlan;
   /**
    * B*-Tree of placed modules (created on demand)
    */
@@ -129,25 +134,10 @@ public class Individual
    */
   private Individual(final BTree<NumberedValue<Module>> prototype, final PoemsActionSequence sequence)
   {
-    this(prototype, sequence.apply(prototype), sequence);
-  }
-  
-  /**
-   * Creates a new instance.
-   * 
-   * @param original prototype
-   * @param modified modified prototype
-   * @param sequence action sequence
-   */
-  private Individual(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified, final PoemsActionSequence sequence)
-  {
-    // save the sequence
+    // save the prototype and the sequence
     
+    this.prototype = prototype;
     this.sequence = sequence;
-    
-    // save the build plan
-    
-    this.buildPlan = modified;
     
     // the modules are placed on demand
     
@@ -155,7 +145,18 @@ public class Individual
     
     // compute fitness
     
-    this.fitness = Individual.evaluateFitness(original, this.buildPlan);
+    if (Setup.FAST_EVALUATION)
+    {
+      // evaluated on the array B*-Tree, the build plan is created on demand
+      
+      this.buildPlan = null;
+      this.fitness = FastEvaluator.evaluate(prototype, sequence);
+    }
+    else
+    {
+      this.buildPlan = sequence.apply(prototype);
+      this.fitness = Individual.evaluateFitness(prototype, this.buildPlan);
+    }
     
     Individual.evaluations++;
   }
@@ -179,6 +180,7 @@ public class Individual
    */
   private Individual(final PoemsActionSequence sequence, final BTree<NumberedValue<Module>> buildPlan, final int fitness)
   {
+    this.prototype = buildPlan;
     this.sequence = sequence;
     this.buildPlan = buildPlan;
     this.buildResult = null;
@@ -223,6 +225,11 @@ public class Individual
    */
   public BTree<NumberedValue<Module>> getBuildPlan()
   {
+    if (this.buildPlan == null)
+    {
+      this.buildPlan = this.sequence.apply(this.prototype);
+    }
+    
     return this.buildPlan;
   }
   
@@ -235,7 +242,7 @@ public class Individual
   {
     if (this.buildResult == null)
     {
-      this.buildResult = Placer.placeNumbered(this.buildPlan);
+      this.buildResult = Placer.placeNumbered(this.getBuildPlan());
     }
     
     return this.buildResult;

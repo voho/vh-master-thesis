@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -251,5 +252,11 @@ public class MoveNodePoemsAction extends AbstractPoemsAction
         input.hasRight()
             ? MoveNodePoemsAction.insert(input.getRight(), value, target, left)
             : null);
+  }
+
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.move(this.node1, this.node2, this.left);
   }
 }

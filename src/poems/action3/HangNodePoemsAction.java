@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -163,5 +164,11 @@ public class HangNodePoemsAction extends AbstractPoemsAction
                   left)
               : null);
     }
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.hang(this.node1, this.node2, this.left);
   }
 }

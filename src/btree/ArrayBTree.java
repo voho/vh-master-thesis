@@ -1,15 +1,12 @@
-package poems.hybrid;
+package btree;
 
 import java.util.Arrays;
 
 import module.Module;
-import btree.BTree;
-import btree.NumberedValue;
 
 /**
- * Mutable B*-Tree stored in arrays, used by the late acceptance POEMS. The
- * tree is modified in place, which is much faster than creating a new
- * immutable tree for every modification.
+ * Mutable B*-Tree stored in arrays. The tree is modified in place, which is
+ * much faster than creating a new immutable tree for every modification.
  *
  * Each node holds one module. Modules are addressed by their numbers (the
  * same numbers as in the numbered prototype), as in the POEMS actions, where
@@ -733,10 +730,54 @@ public final class ArrayBTree
    */
   public boolean sameAs(final ArrayBTree other)
   {
-    return (this.root == other.root)
-        && Arrays.equals(this.left, other.left)
-        && Arrays.equals(this.right, other.right)
-        && Arrays.equals(this.module, other.module)
-        && Arrays.equals(this.rotated, other.rotated);
+    // simultaneous DFS (the nodes may be numbered differently in both trees)
+
+    final int[] mine = this.stackNode;
+    final int[] theirs = this.stackX;
+    int top = 0;
+
+    mine[top] = this.root;
+    theirs[top] = other.root;
+    top++;
+
+    while (top > 0)
+    {
+      top--;
+
+      final int a = mine[top];
+      final int b = theirs[top];
+      final int m = this.module[a];
+
+      if ((m != other.module[b]) || (this.rotated[m] != other.rotated[m]))
+      {
+        return false;
+      }
+
+      if ((this.left[a] == ArrayBTree.NONE) != (other.left[b] == ArrayBTree.NONE))
+      {
+        return false;
+      }
+
+      if ((this.right[a] == ArrayBTree.NONE) != (other.right[b] == ArrayBTree.NONE))
+      {
+        return false;
+      }
+
+      if (this.left[a] != ArrayBTree.NONE)
+      {
+        mine[top] = this.left[a];
+        theirs[top] = other.left[b];
+        top++;
+      }
+
+      if (this.right[a] != ArrayBTree.NONE)
+      {
+        mine[top] = this.right[a];
+        theirs[top] = other.right[b];
+        top++;
+      }
+    }
+
+    return true;
   }
 }
