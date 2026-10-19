@@ -45,6 +45,26 @@ public final class LatePoems
    */
   private static final double[] WALK = new double[3];
   /**
+   * probabilities of the action types (adaptive selection)
+   */
+  private static final double[] PROBABILITY = new double[LatePoems.ACTION_TYPES];
+  /**
+   * number of steps with each action type in the current window
+   */
+  private static final long[] TRIES = new long[LatePoems.ACTION_TYPES];
+  /**
+   * number of improving steps with each action type in the current window
+   */
+  private static final long[] SUCCESSES = new long[LatePoems.ACTION_TYPES];
+  /**
+   * number of steps after which the action type probabilities are updated
+   */
+  private static final long WINDOW = 100000;
+  /**
+   * minimal probability of each action type
+   */
+  private static final double MIN_PROBABILITY = 0.05;
+  /**
    * minimal automatic history length
    */
   private static final int MIN_HISTORY = 100;
@@ -124,6 +144,13 @@ public final class LatePoems
 
     LatePoems.evaluations = 1;
 
+    // action types of the current step (and their success statistics)
+
+    final int[] steps = new int[length];
+    Arrays.fill(LatePoems.PROBABILITY, 1.0 / LatePoems.ACTION_TYPES);
+    Arrays.fill(LatePoems.TRIES, 0);
+    Arrays.fill(LatePoems.SUCCESSES, 0);
+
     while ((maxEvaluations <= 0) || (LatePoems.evaluations < maxEvaluations))
     {
       if ((LatePoems.evaluations & 0xFF) == 0)
@@ -167,10 +194,11 @@ public final class LatePoems
       candidate.copyFrom(current);
 
       final int actions = Utility.random(1, length);
+      final int[] step = steps;
 
       for (int i = 0; i < actions; i++)
       {
-        LatePoems.applyRandomAction(candidate, last);
+        step[i] = LatePoems.applyRandomAction(candidate, last);
       }
 
       // the candidate is accepted if its area does not exceed the threshold:
@@ -184,6 +212,11 @@ public final class LatePoems
       final long area = candidate.place(threshold);
 
       LatePoems.evaluations++;
+
+      if (Setup.ADAPTIVE)
+      {
+        LatePoems.learn(step, actions, area < currentArea);
+      }
 
       if (area <= threshold)
       {
@@ -263,7 +296,7 @@ public final class LatePoems
    * @param tree tree to modify
    * @param last the last module number
    */
-  private static void applyRandomAction(final ArrayBTree tree, final int last)
+  private static int applyRandomAction(final ArrayBTree tree, final int last)
   {
     final int a = Utility.random(0, last);
     int b = (last > 0)
@@ -288,9 +321,11 @@ public final class LatePoems
         b = neighbour;
       }
     }
-    final boolean flag = Utility.randomBoolean();
 
-    switch (LatePoems.randomActionType())
+    final boolean flag = Utility.randomBoolean();
+    final int type = LatePoems.randomActionType();
+
+    switch (type)
     {
     case 0:
       tree.flip(a, flag);
@@ -314,6 +349,53 @@ public final class LatePoems
       tree.move(a, b, flag);
       break;
     }
+
+    return type;
+  }
+
+  /**
+   * Updates the success statistics of the action types used in the step and
+   * (once per window) the action type probabilities: they are proportional to
+   * the success rates in the last window, but at least the minimal
+   * probability.
+   *
+   * @param step action types used in the step
+   * @param actions number of actions in the step
+   * @param improved the step improved the prototype
+   */
+  private static void learn(final int[] step, final int actions, final boolean improved)
+  {
+    for (int i = 0; i < actions; i++)
+    {
+      LatePoems.TRIES[step[i]]++;
+
+      if (improved)
+      {
+        LatePoems.SUCCESSES[step[i]]++;
+      }
+    }
+
+    if (LatePoems.evaluations % LatePoems.WINDOW != 0)
+    {
+      return;
+    }
+
+    final double[] rate = new double[LatePoems.ACTION_TYPES];
+    double sum = 0;
+
+    for (int type = 0; type < LatePoems.ACTION_TYPES; type++)
+    {
+      rate[type] = (LatePoems.SUCCESSES[type] + 0.5) / (LatePoems.TRIES[type] + 1.0);
+      sum += rate[type];
+    }
+
+    for (int type = 0; type < LatePoems.ACTION_TYPES; type++)
+    {
+      LatePoems.PROBABILITY[type] = LatePoems.MIN_PROBABILITY + ((1 - LatePoems.ACTION_TYPES * LatePoems.MIN_PROBABILITY) * rate[type] / sum);
+    }
+
+    Arrays.fill(LatePoems.TRIES, 0);
+    Arrays.fill(LatePoems.SUCCESSES, 0);
   }
 
   /**
@@ -323,6 +405,23 @@ public final class LatePoems
    */
   private static int randomActionType()
   {
+    if (Setup.ADAPTIVE)
+    {
+      double r = Utility.randomDouble();
+
+      for (int type = 0; type < LatePoems.ACTION_TYPES - 1; type++)
+      {
+        r -= LatePoems.PROBABILITY[type];
+
+        if (r < 0)
+        {
+          return type;
+        }
+      }
+
+      return LatePoems.ACTION_TYPES - 1;
+    }
+
     if (Setup.ACTION_WEIGHTS == null)
     {
       return Utility.random(0, LatePoems.ACTION_TYPES - 1);

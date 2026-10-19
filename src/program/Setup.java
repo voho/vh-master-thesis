@@ -91,6 +91,11 @@ public class Setup
    * evaluations divided by this ratio
    */
   public static final long HISTORY_RATIO = Long.getLong("poems.ratio", 20000).longValue();
+  /**
+   * the late acceptance POEMS chooses the action types adaptively (by their
+   * recent success rates) instead of uniformly
+   */
+  public static final boolean ADAPTIVE = Setup.flag("poems.adaptive", false);
   
   // MUTABLE PARAMETERS
   // ==================
