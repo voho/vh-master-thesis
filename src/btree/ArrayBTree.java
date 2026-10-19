@@ -416,6 +416,64 @@ public final class ArrayBTree
             : null);
   }
 
+  /**
+   * Returns a module close to the given module in the tree: the module
+   * reached by a random walk of the given length (each step goes to the
+   * parent or to a child). The walk never returns the starting module.
+   *
+   * @param a module number
+   * @param steps number of steps
+   * @param random random numbers (one for each step)
+   * @return module number (or the starting module if there is no other)
+   */
+  public int getNeighbour(final int a, final int steps, final double[] random)
+  {
+    int current = this.node[a];
+
+    for (int i = 0; i < steps; i++)
+    {
+      // candidates: parent, left child, right child
+
+      final int p = this.parent[current];
+      final int l = this.left[current];
+      final int r = this.right[current];
+      final int count = ((p != ArrayBTree.NONE) ? 1 : 0) + ((l != ArrayBTree.NONE) ? 1 : 0) + ((r != ArrayBTree.NONE) ? 1 : 0);
+
+      if (count == 0)
+      {
+        break;
+      }
+
+      int pick = (int) (random[i] * count);
+
+      if (p != ArrayBTree.NONE)
+      {
+        if (pick == 0)
+        {
+          current = p;
+          continue;
+        }
+
+        pick--;
+      }
+
+      if (l != ArrayBTree.NONE)
+      {
+        if (pick == 0)
+        {
+          current = l;
+          continue;
+        }
+
+        pick--;
+      }
+
+      current = r;
+    }
+
+    return this.module[current];
+  }
+
   // ACTIONS
   // =======
 

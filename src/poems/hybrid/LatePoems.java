@@ -40,6 +40,10 @@ public final class LatePoems
    * number of evaluations done in the last run
    */
   private static long evaluations = 0;
+  /**
+   * random numbers for the walk to a close module (at most 3 steps)
+   */
+  private static final double[] WALK = new double[3];
 
   /**
    * Creation is not allowed.
@@ -213,9 +217,28 @@ public final class LatePoems
   private static void applyRandomAction(final ArrayBTree tree, final int last)
   {
     final int a = Utility.random(0, last);
-    final int b = (last > 0)
+    int b = (last > 0)
         ? Utility.increment(a, Utility.random(1, last), last)
         : a;
+
+    if ((Setup.LOCAL_PARTNER > 0) && Utility.randomBoolean(Setup.LOCAL_PARTNER))
+    {
+      // the second module is chosen close to the first one in the tree
+
+      final double[] random = LatePoems.WALK;
+
+      for (int i = 0; i < random.length; i++)
+      {
+        random[i] = Utility.randomDouble();
+      }
+
+      final int neighbour = tree.getNeighbour(a, Utility.random(1, random.length), random);
+
+      if (neighbour != a)
+      {
+        b = neighbour;
+      }
+    }
     final boolean flag = Utility.randomBoolean();
 
     switch (LatePoems.randomActionType())

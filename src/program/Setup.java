@@ -81,6 +81,11 @@ public class Setup
    * does not improve for this number of evaluations per module (0 = never)
    */
   public static final int RESTART = Integer.getInteger("poems.restart", 0).intValue();
+  /**
+   * probability that the late acceptance POEMS chooses the second module of
+   * an action close to the first one in the tree (0 = always at random)
+   */
+  public static final double LOCAL_PARTNER = Double.parseDouble(System.getProperty("poems.local", "0"));
   
   // MUTABLE PARAMETERS
   // ==================
