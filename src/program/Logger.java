@@ -198,6 +198,11 @@ final public class Logger
   
   public static void prototype(final BTree<NumberedValue<Module>> prototype)
   {
+    if (!Setup.EXPORT)
+    {
+      return;
+    }
+    
     try
     {
       Exporter.treeToDot(prototype, new File(Logger.dirOutput, "prototype.dot"));
@@ -213,6 +218,11 @@ final public class Logger
   
   public static void improvement(final Individual best, final int i)
   {
+    if (!Setup.EXPORT)
+    {
+      return;
+    }
+    
     try
     {
       Exporter.treeToSvg(best.getBuildResult(), false, new File(Logger.dirOutput, String.format("i_%08d.svg", i)));

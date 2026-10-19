@@ -80,11 +80,24 @@ public class Population
    */
   public Individual evolve(final int generations)
   {
+    return this.evolve(generations, Long.MAX_VALUE);
+  }
+  
+  /**
+   * Starts an evolution and returns the best individual found. The evolution
+   * is stopped early when the deadline is reached.
+   * 
+   * @param generations generation count
+   * @param deadline time (in milliseconds) when the evolution must stop
+   * @return the best individual
+   */
+  public Individual evolve(final int generations, final long deadline)
+  {
     Population.LOG.log("Starting genetic algorithm with %d generations...", generations);
     
     Individual best = null;
     
-    for (int ig = 0; ig < generations; ig++)
+    for (int ig = 0; (ig < generations) && ((best == null) || (System.currentTimeMillis() < deadline)); ig++)
     {
       Population.LOG.log("GENERATION %d", ig + 1);
       
@@ -110,7 +123,7 @@ public class Population
       
       // in each generation, create new individual(s)
       
-      if (Math.random() < Setup.PROB_CROSSOVER)
+      if (Utility.randomDouble() < Setup.PROB_CROSSOVER)
       {
         // by crossover
         

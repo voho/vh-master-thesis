@@ -62,6 +62,18 @@ public class Setup
    */
   public static int NICHE_SIZE = 20;
   /**
+   * seed of the random number generator
+   */
+  public static long SEED = 0;
+  /**
+   * time limit of a single run in milliseconds (0 = no limit)
+   */
+  public static long TIME_LIMIT = 0;
+  /**
+   * export results and statistics into the output directory
+   */
+  public static boolean EXPORT = true;
+  /**
    * input directory with benchmarks
    */
   public static File DIR_INPUT = null;

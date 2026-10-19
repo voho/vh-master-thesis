@@ -1,6 +1,7 @@
 package program;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Utility class.
@@ -13,6 +14,10 @@ public class Utility
    * logger instance
    */
   private static Logger LOG = Logger.create(Utility.class);
+  /**
+   * random number generator (can be seeded to make runs reproducible)
+   */
+  private static Random RANDOM = new Random();
   
   /**
    * Creation is not allowed.
@@ -20,6 +25,26 @@ public class Utility
   private Utility()
   {
     // nothing
+  }
+  
+  /**
+   * Sets the seed of the random number generator.
+   * 
+   * @param seed seed
+   */
+  public static void setSeed(final long seed)
+  {
+    Utility.RANDOM = new Random(seed);
+  }
+  
+  /**
+   * Returns a random real number in the range [0, 1).
+   * 
+   * @return a random real number
+   */
+  public static double randomDouble()
+  {
+    return Utility.RANDOM.nextDouble();
   }
   
   /**
@@ -41,7 +66,7 @@ public class Utility
       throw new IllegalArgumentException("Maximum must be greater than or equal to minimum.");
     }
     
-    return min + (int) (Math.random() * ((max - min) + 1));
+    return min + (int) (Utility.randomDouble() * ((max - min) + 1));
   }
   
   /**
@@ -165,6 +190,6 @@ public class Utility
    */
   public static boolean randomBoolean(final double trueProbability)
   {
-    return (Math.random() < trueProbability);
+    return (Utility.randomDouble() < trueProbability);
   }
 }

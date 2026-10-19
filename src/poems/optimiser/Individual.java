@@ -22,6 +22,10 @@ public class Individual
    */
   private static final Logger LOG = Logger.create(Individual.class);
   /**
+   * number of fitness evaluations done so far
+   */
+  private static long evaluations = 0;
+  /**
    * action sequence associated with this individual
    */
   private final PoemsActionSequence sequence;
@@ -125,6 +129,18 @@ public class Individual
     // compute fitness
     
     this.fitness = Individual.evaluateFitness(original, this.buildPlan, this.buildResult);
+    
+    Individual.evaluations++;
+  }
+  
+  /**
+   * Returns the number of fitness evaluations done so far.
+   * 
+   * @return the number of fitness evaluations
+   */
+  public static long getEvaluations()
+  {
+    return Individual.evaluations;
   }
   
   /**

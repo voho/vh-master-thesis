@@ -115,7 +115,7 @@ public class PoemsActionSequence extends AbstractPoemsAction
     PoemsActionSequence.LOG.log("Creating a sequence by mutation...");
     PoemsActionSequence.LOG.log("Parent: %s", parent);
     
-    if (Math.random() < Setup.PROB_BIG_ACTION_CHANGE)
+    if (Utility.randomDouble() < Setup.PROB_BIG_ACTION_CHANGE)
     {
       // mutate actions
       

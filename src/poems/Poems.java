@@ -23,6 +23,10 @@ final public class Poems
    * logger instance
    */
   private static final Logger LOG = Logger.create(Poems.class);
+  /**
+   * number of iterations done in the last run
+   */
+  private static int iterations = 0;
   
   /**
    * Creates a new instance.
@@ -67,8 +71,16 @@ final public class Poems
     
     Individual best = null;
     
-    for (int ii = 0; ii < i; ii++)
+    final long deadline = (Setup.TIME_LIMIT > 0)
+        ? System.currentTimeMillis() + Setup.TIME_LIMIT
+        : Long.MAX_VALUE;
+    
+    Poems.iterations = 0;
+    
+    for (int ii = 0; (ii < i) && ((best == null) || (System.currentTimeMillis() < deadline)); ii++)
     {
+      Poems.iterations++;
+      
       Poems.LOG.log("ITERATION %d", ii + 1);
       
       // create a new population
@@ -82,7 +94,7 @@ final public class Poems
       
       // optimise the prototype
       
-      final Individual temp = population.evolve(g);
+      final Individual temp = population.evolve(g, deadline);
       
       Poems.LOG.log("Iteration %d brought: %s", ii, temp.toString());
       
@@ -106,5 +118,15 @@ final public class Poems
     }
     
     return best;
+  }
+  
+  /**
+   * Returns the number of iterations done in the last run.
+   * 
+   * @return the number of iterations
+   */
+  public static int getIterations()
+  {
+    return Poems.iterations;
   }
 }
