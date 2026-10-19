@@ -5,6 +5,7 @@ import module.PlacedModule;
 import poems.PoemsActionSequence;
 import poems.PoemsActionSequencePair;
 import program.Logger;
+import program.Setup;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Evaluator;
@@ -22,17 +23,25 @@ public class Individual
    */
   private static final Logger LOG = Logger.create(Individual.class);
   /**
+   * number of fitness evaluations done so far
+   */
+  private static long evaluations = 0;
+  /**
    * action sequence associated with this individual
    */
   private final PoemsActionSequence sequence;
   /**
-   * B*-Tree of unplaced modules
+   * prototype (B*-Tree the action sequence is applied to)
    */
-  private final BTree<NumberedValue<Module>> buildPlan;
+  private final BTree<NumberedValue<Module>> prototype;
   /**
-   * B*-Tree of placed modules
+   * B*-Tree of unplaced modules (created on demand)
    */
-  private final BTree<PlacedModule> buildResult;
+  private BTree<NumberedValue<Module>> buildPlan;
+  /**
+   * B*-Tree of placed modules (created on demand)
+   */
+  private BTree<PlacedModule> buildResult;
   /**
    * fitness value
    */
@@ -53,6 +62,33 @@ public class Individual
     Individual.LOG.log("Creating random individual with sequence: %s", newSequence);
     
     return new Individual(prototype, newSequence);
+  }
+  
+  /**
+   * Creates an individual by applying the sequence to the prototype.
+   * 
+   * @param prototype prototype
+   * @param sequence action sequence
+   * @return a new individual
+   */
+  public static Individual create(final BTree<NumberedValue<Module>> prototype, final PoemsActionSequence sequence)
+  {
+    return new Individual(prototype, sequence);
+  }
+  
+  /**
+   * Creates an individual representing the unmodified prototype (all its
+   * actions are disabled).
+   * 
+   * @param prototype prototype
+   * @param length action sequence length
+   * @return the prototype individual
+   */
+  public static Individual prototype(final BTree<NumberedValue<Module>> prototype, final int length)
+  {
+    final PoemsActionSequence nop = PoemsActionSequence.random(prototype.getValue().getLastNumber(), length, 0);
+    
+    return new Individual(nop, prototype, Placer.measureNumbered(prototype).getFitness());
   }
   
   /**
@@ -98,33 +134,57 @@ public class Individual
    */
   private Individual(final BTree<NumberedValue<Module>> prototype, final PoemsActionSequence sequence)
   {
-    this(prototype, sequence.apply(prototype), sequence);
-  }
-  
-  /**
-   * Creates a new instance.
-   * 
-   * @param original prototype
-   * @param modified modified prototype
-   * @param sequence action sequence
-   */
-  private Individual(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified, final PoemsActionSequence sequence)
-  {
-    // save the sequence
+    // save the prototype and the sequence
     
+    this.prototype = prototype;
     this.sequence = sequence;
     
-    // save the build plan
+    // the modules are placed on demand
     
-    this.buildPlan = modified;
-    
-    // place modules
-    
-    this.buildResult = Placer.placeNumbered(modified);
+    this.buildResult = null;
     
     // compute fitness
     
-    this.fitness = Individual.evaluateFitness(original, this.buildPlan, this.buildResult);
+    if (Setup.FAST_EVALUATION)
+    {
+      // evaluated on the array B*-Tree, the build plan is created on demand
+      
+      this.buildPlan = null;
+      this.fitness = FastEvaluator.evaluate(prototype, sequence);
+    }
+    else
+    {
+      this.buildPlan = sequence.apply(prototype);
+      this.fitness = Individual.evaluateFitness(prototype, this.buildPlan);
+    }
+    
+    Individual.evaluations++;
+  }
+  
+  /**
+   * Returns the number of fitness evaluations done so far.
+   * 
+   * @return the number of fitness evaluations
+   */
+  public static long getEvaluations()
+  {
+    return Individual.evaluations;
+  }
+  
+  /**
+   * Creates a new instance with a known fitness.
+   * 
+   * @param sequence action sequence
+   * @param buildPlan B*-Tree of unplaced modules
+   * @param fitness fitness value
+   */
+  private Individual(final PoemsActionSequence sequence, final BTree<NumberedValue<Module>> buildPlan, final int fitness)
+  {
+    this.prototype = buildPlan;
+    this.sequence = sequence;
+    this.buildPlan = buildPlan;
+    this.buildResult = null;
+    this.fitness = fitness;
   }
   
   /**
@@ -132,32 +192,20 @@ public class Individual
    * 
    * @param original original B*-Tree
    * @param modified modified B*-Tree
-   * @param placed placed B*-Tree
    * @return fitness value
    */
-  private static int evaluateFitness(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified, final BTree<PlacedModule> placed)
+  private static int evaluateFitness(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified)
   {
     if (Evaluator.equals(modified, original))
     {
       Individual.LOG.log("Equality of input and output trees, minimal fitness returned.");
-      Individual.LOG.log("Original: %s", original.toString());
-      Individual.LOG.log("Modified: %s", modified.toString());
+      Individual.LOG.log("Original: %s", original);
+      Individual.LOG.log("Modified: %s", modified);
       
       return Integer.MIN_VALUE;
     }
     
-    return Individual.evaluateFitness(placed);
-  }
-  
-  /**
-   * Evaluates a solution fitness.
-   * 
-   * @param placed placed B*-Tree
-   * @return fitness value
-   */
-  private static int evaluateFitness(final BTree<PlacedModule> placed)
-  {
-    return Evaluator.evaluate(placed).getFitness();
+    return Placer.measureNumbered(modified).getFitness();
   }
   
   /**
@@ -177,6 +225,11 @@ public class Individual
    */
   public BTree<NumberedValue<Module>> getBuildPlan()
   {
+    if (this.buildPlan == null)
+    {
+      this.buildPlan = this.sequence.apply(this.prototype);
+    }
+    
     return this.buildPlan;
   }
   
@@ -187,6 +240,11 @@ public class Individual
    */
   public BTree<PlacedModule> getBuildResult()
   {
+    if (this.buildResult == null)
+    {
+      this.buildResult = Placer.placeNumbered(this.getBuildPlan());
+    }
+    
     return this.buildResult;
   }
   

@@ -1,6 +1,7 @@
 package program;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Utility class.
@@ -13,6 +14,10 @@ public class Utility
    * logger instance
    */
   private static Logger LOG = Logger.create(Utility.class);
+  /**
+   * random number generator (can be seeded to make runs reproducible)
+   */
+  private static Random RANDOM = new Random();
   
   /**
    * Creation is not allowed.
@@ -20,6 +25,26 @@ public class Utility
   private Utility()
   {
     // nothing
+  }
+  
+  /**
+   * Sets the seed of the random number generator.
+   * 
+   * @param seed seed
+   */
+  public static void setSeed(final long seed)
+  {
+    Utility.RANDOM = new Random(seed);
+  }
+  
+  /**
+   * Returns a random real number in the range [0, 1).
+   * 
+   * @return a random real number
+   */
+  public static double randomDouble()
+  {
+    return Utility.RANDOM.nextDouble();
   }
   
   /**
@@ -41,7 +66,7 @@ public class Utility
       throw new IllegalArgumentException("Maximum must be greater than or equal to minimum.");
     }
     
-    return min + (int) (Math.random() * ((max - min) + 1));
+    return min + (int) (Utility.randomDouble() * ((max - min) + 1));
   }
   
   /**
@@ -60,7 +85,7 @@ public class Utility
   
   /**
    * Increments a given value. If the incremented value grows over the maximum,
-   * it is first read modulo maximum and then returned.
+   * it wraps around to zero (the result is in the range [0, maximum]).
    * 
    * @param value value to increment
    * @param increment increment to be added to the value
@@ -89,7 +114,7 @@ public class Utility
       return 0;
     }
     
-    return (value + increment) % max;
+    return (value + increment) % (max + 1);
   }
   
   /**
@@ -99,6 +124,13 @@ public class Utility
    */
   public static void shuffleArray(final Object[] array)
   {
+    if (array.length < 2)
+    {
+      // nothing to shuffle (and no two different indices to swap)
+      
+      return;
+    }
+    
     Utility.shuffleArray(array, Utility.random(1, array.length));
   }
   
@@ -110,7 +142,7 @@ public class Utility
    */
   private static void shuffleArray(final Object[] array, final int shakes)
   {
-    Utility.LOG.log("Shuffling array: " + Arrays.toString(array));
+    Utility.LOG.log("Shuffling array: %s", Arrays.asList(array));
     
     int remains = 0;
     
@@ -144,7 +176,7 @@ public class Utility
       }
     }
     
-    Utility.LOG.log("Shuffled array: " + Arrays.toString(array));
+    Utility.LOG.log("Shuffled array: %s", Arrays.asList(array));
   }
   
   /**
@@ -165,6 +197,6 @@ public class Utility
    */
   public static boolean randomBoolean(final double trueProbability)
   {
-    return (Math.random() < trueProbability);
+    return (Utility.randomDouble() < trueProbability);
   }
 }

@@ -1,0 +1,20 @@
+\begin{table}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccrr@{}}
+\toprule
+ &  &  &  & \multicolumn{2}{c}{$\hat{A}_{12}$ of LA-POEMS vs.} \\
+Benchmark & original & improved & LA-POEMS & original & improved \\
+\midrule
+n30b & $2.35_{\pm 0.65}\ (1.56)$ & $2.61_{\pm 0.64}\ (1.90)$ & $\mathbf{1.70_{\pm 0.28}\ (1.28)}$ & 0.72 & 0.92 \\
+n50b & $2.91_{\pm 0.64}\ (1.69)$ & $1.70_{\pm 0.12}\ (1.57)$ & $1.85_{\pm 0.29}\ (1.52)$ & 0.88 & 0.44 \\
+n100b & $5.23_{\pm 0.28}\ (4.97)$ & $\mathbf{2.40_{\pm 0.18}\ (2.04)}$ & $\mathbf{1.95_{\pm 0.12}\ (1.74)}$ & 1.00 & 0.96 \\
+n100c & $5.75_{\pm 0.74}\ (5.04)$ & $\mathbf{2.51_{\pm 0.17}\ (2.35)}$ & $2.07_{\pm 0.29}\ (1.70)$ & 1.00 & 0.86 \\
+n200b & $9.71_{\pm 0.56}\ (8.76)$ & $\mathbf{4.04_{\pm 0.21}\ (3.64)}$ & $\mathbf{2.86_{\pm 0.11}\ (2.71)}$ & 1.00 & 1.00 \\
+n200c & $10.27_{\pm 1.02}\ (9.03)$ & $\mathbf{4.15_{\pm 0.25}\ (3.69)}$ & $\mathbf{2.75_{\pm 0.26}\ (2.28)}$ & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\caption{Final comparison of the original POEMS, the improved POEMS and LA-POEMS on the held-out benchmarks (dead space [\%], 60\,s, seeds 101--105; mean, standard deviation and best run). Each algorithm is tested against the column to its left; the last columns give the probability that a run of LA-POEMS ends with less dead space than a run of the other algorithm}
+\label{tab:heldout}
+\end{table}

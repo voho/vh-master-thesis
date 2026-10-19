@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -57,6 +58,14 @@ public class FlipPoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(1, this.number), this.recursive
+        ? 1
+        : 0);
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("flip(%d,%s)", this.number, this.recursive);
@@ -101,5 +110,11 @@ public class FlipPoemsAction extends AbstractPoemsAction
                 recursive,
                 flipNow || wasFlipped)
             : null);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.flip(this.number, this.recursive);
   }
 }

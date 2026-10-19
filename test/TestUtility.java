@@ -74,7 +74,7 @@ public class TestUtility
    */
   public static void testNumberedTree(final BTree<? extends NumberedValue<?>> btree, final BTree<?>... nodes)
   {
-    final BTree<?>[] correct = (BTree<?>[]) Arrays.asList(nodes).toArray();
+    final BTree<?>[] correct = Arrays.copyOf(nodes, nodes.length);
     
     int i = 0;
     

@@ -1,0 +1,38 @@
+\section{RQ3: Design of LA-POEMS}
+\label{sec:rq3}
+
+The design of LA-POEMS was explored in a sequence of screening experiments (30\,s, seeds 1--6, the seven benchmarks except apte), starting from late acceptance with the history length $L = 1000$ and steps of at most three actions.
+
+\subsection{Single Actions}
+
+Table~\ref{tab:actionstats} shows how often a step consisting of a single action of each type improves the prototype or leaves its area unchanged. Rotating a module (flip), exchanging two modules and transposing a subtree (rotate) improve the prototype most often; on n100 and n300, moving a single node is next. Mirroring, exchanging subtrees and hanging subtrees rarely improve the prototype, but 10--37\,\% of them do not change the area. They are moves along plateaus: they change the structure of the tree without affecting the enclosing rectangle, which keeps the search moving when no improving step is available.
+
+\input{tables/rq3_actions}
+
+\subsection{Acceptance}
+
+Table~\ref{tab:rq3acceptance} compares the acceptance criteria. With late acceptance, the history length sets how quickly the search converges. A long history ($L = 5000$) is significantly worse on the three largest instances, on which the search does not converge within 30 seconds; a short one ($L = 200$) is significantly better on n200 and n300 and slightly worse on xerox, ami33 and ami49. The automatic history length adapts to the speed of the evaluation and to the time budget. It finds the best known floorplan of hp (1.32\,\%, the area reported for the B*-Tree in \cite{btree}) in every run and is good on the large instances, but it gets stuck on xerox. Simulated annealing with a high initial temperature ($T_0 = 10^{-2}$ of the area of the modules) has the best score. It finds the best known floorplan of xerox (2.30\,\%) in five of six runs and that of hp in four, and it is significantly better than late acceptance with $L = 1000$ on xerox, n200 and n300; on ami33 and ami49 it is slightly, but not significantly, worse. Lower initial temperatures are better on ami49 and n100, but they get stuck on hp as often as late acceptance does.
+
+\input{tables/rq3_acceptance}
+
+\subsection{Steps and Other Options}
+
+Table~\ref{tab:rq3lahc} varies the steps of LA-POEMS with late acceptance. Steps of a single action are significantly better on n100 and slightly better on n200 and n300, but much worse on xerox, hp and ami33, which need the compound steps of POEMS to escape from local optima. Steps of at most two actions are significantly better on n100 and similar elsewhere. Weights favouring the frequently improving action types help the large instances and hurt ami33 and ami49. Restarts solve the small instances: hp reaches 1.32\,\% in every run and xerox 2.34--2.37\,\%; on the large instances, they do not help. Choosing the second module of an action close to the first one has no consistent effect.
+
+\input{tables/rq3_lahc_options}
+
+Table~\ref{tab:rq3sa} varies the options of LA-POEMS with simulated annealing. As with late acceptance, steps of a single action are significantly better on n100 and n200 and significantly worse on hp. Local partners are significantly better on n200, and together with steps of at most two actions they are significantly better on n200 and n300. The adaptive selection of the action types is significantly worse on n300, presumably because it suppresses the action types that rarely improve the prototype but move it along plateaus (Table~\ref{tab:actionstats}). For comparison, the table also shows late acceptance with the automatic history length and restarts, the best configuration with late acceptance: it solves hp in every run, but it is significantly worse on xerox and n300.
+
+\input{tables/rq3_sa_options}
+
+\subsection{The Final Configuration}
+
+The score was fixed in advance as the criterion for choosing the configuration (Section~\ref{sec:method}). The configuration with the best score among the 20 screened ones is simulated annealing with $T_0 = 10^{-2}$ and $T_1 = 10^{-5}$, steps of at most $N = 2$ actions and local partners with the probability 0.5; it is the default configuration of the program. Its advantage over the other configurations with annealing and over late acceptance with restarts is small and comes from the two largest instances, while late acceptance with restarts is more reliable on hp. Because the configuration was selected on the same seeds on which it was screened, its screening results are optimistically biased; the final comparison (Section~\ref{sec:rq4}) therefore uses new seeds and held-out instances.
+
+\subsection{LA-POEMS and POEMS at Equal Speed}
+
+Table~\ref{tab:rq3equal} compares POEMS and LA-POEMS on the same array implementation with the same time, which isolates the effect of the genetic algorithm. The first design of LA-POEMS, late acceptance with $L = 1000$ and steps of at most three actions, which was not tuned, is already significantly better than POEMS on ami33, n100 and n200 ($\hat{A}_{12} = 0.86$--$1$); it is worse on xerox and hp and equal on n300, but not significantly. The final configuration is significantly better than POEMS on five of the seven instances ($\hat{A}_{12} \geq 0.92$) and not significantly different on hp and ami49. Because the final configuration was selected on these seeds, its advantage is overestimated here; Section~\ref{sec:rq4} repeats the comparison with new seeds against the improved POEMS.
+
+\input{tables/rq3_equal}
+
+\paragraph{Answer to RQ3.} Evolving the improvement steps by a genetic algorithm is not necessary. With the same actions, the same implementation and the same time, applying random steps immediately and accepting them by a simple criterion finds significantly better floorplans on most instances and significantly worse ones on none. The acceptance criterion is the most important design choice: simulated annealing with a high initial temperature is the most robust, while late acceptance with a fixed history length is good only for budgets that match the history length. Steps of at most two actions and local partners help on the large instances; steps of a single action fail on the small ones, which need compound steps to escape from local optima; weights and the adaptive selection of the action types do not help.

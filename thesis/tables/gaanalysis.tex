@@ -1,0 +1,22 @@
+\begin{table}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lrrrrcrr@{}}
+\toprule
+ & & \multicolumn{3}{c}{children [\%]} & iterations [\%] & best found & evaluations \\
+Benchmark & iterations & duplicate & unchanged & as parent & impr.\ / equal / worse & in generation & per impr. \\
+\midrule
+apte & 2071 & 46.6 & 3.2 & 66.7 & 0.2 / 99.8 / 0.0 & 1 / 0 & 959\,k \\
+xerox & 2312 & 45.4 & 2.7 & 59.5 & 0.4 / 98.1 / 1.5 & 38 / 0 & 476\,k \\
+hp & 2194 & 44.7 & 3.4 & 62.2 & 0.0 / 100.0 / 0.0 & 1 / 0 & -- \\
+ami33 & 2133 & 45.3 & 2.0 & 60.6 & 0.5 / 98.6 / 0.9 & 30 / 0 & 396\,k \\
+ami49 & 2061 & 45.5 & 1.9 & 59.3 & 1.6 / 67.3 / 31.0 & 195 / 32 & 113\,k \\
+n100 & 1674 & 45.1 & 1.6 & 63.7 & 2.0 / 97.4 / 0.5 & 31 / 0 & 91\,k \\
+n200 & 1370 & 46.4 & 1.0 & 59.7 & 3.4 / 96.3 / 0.3 & 30 / 0 & 54\,k \\
+n300 & 1131 & 46.7 & 0.9 & 59.5 & 2.7 / 95.9 / 1.3 & 42 / 0 & 68\,k \\
+\bottomrule
+\end{tabular}
+\caption{Behaviour of the genetic algorithm of POEMS ($G = 1000$, $N = 3$, $S = 50$, 20\,s runs, seed 1). Children: duplicates of an individual of the population (same enabled actions), children that do not change the prototype, and children with the same fitness as a parent. Iterations: the best sequence of the iteration improves the prototype, has the same fitness, or is worse. Best found in generation: mean / median generation of the last improvement of the best individual of an iteration.}
+\label{tab:gaanalysis}
+\end{table}

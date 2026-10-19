@@ -1,0 +1,42 @@
+diff -ru a/src/poems/hybrid/LatePoems.java b/src/poems/hybrid/LatePoems.java
+--- a/src/poems/hybrid/LatePoems.java
++++ b/src/poems/hybrid/LatePoems.java
+@@ -36,6 +36,8 @@
+    * number of evaluations done in the last run
+    */
+   private static long evaluations = 0;
++  public static long[] tried = new long[7], improved = new long[7], neutral = new long[7], worseAcc = new long[7];
++  private static int lastType;
+ 
+   /**
+    * Creation is not allowed.
+@@ -98,6 +100,7 @@
+       final long area = candidate.place();
+ 
+       LatePoems.evaluations++;
++      if (actions == 1) { tried[lastType]++; if (area < currentArea) improved[lastType]++; else if (area == currentArea) neutral[lastType]++; else if (area <= history[slot]) worseAcc[lastType]++; }
+ 
+       // late acceptance
+ 
+@@ -142,7 +145,8 @@
+         : a;
+     final boolean flag = Utility.randomBoolean();
+ 
+-    switch (Utility.random(0, LatePoems.ACTION_TYPES - 1))
++    lastType = Utility.random(0, LatePoems.ACTION_TYPES - 1);
++    switch (lastType)
+     {
+     case 0:
+       tree.flip(a, flag);
+diff -ru a/src/program/Benchmark.java b/src/program/Benchmark.java
+--- a/src/program/Benchmark.java
++++ b/src/program/Benchmark.java
+@@ -78,6 +78,8 @@
+ 
+       placed = Placer.placeNumbered(LatePoems.solve(modules, Setup.TIME_LIMIT, 0, n, s));
+       evaluations = LatePoems.getEvaluations();
++      String[] names = {"flip","rotate","mirror","xvalue","xnode","hang","move"};
++      for (int t = 0; t < 7; t++) System.err.println(String.format(Locale.US, "  %-7s tried=%9d improve=%.4f%% neutral=%.2f%% worseAccepted=%.3f%%", names[t], LatePoems.tried[t], 100.0*LatePoems.improved[t]/LatePoems.tried[t], 100.0*LatePoems.neutral[t]/LatePoems.tried[t], 100.0*LatePoems.worseAcc[t]/LatePoems.tried[t]));
+       iterations = 0;
+     }
+     else

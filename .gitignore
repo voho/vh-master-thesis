@@ -4,7 +4,8 @@
 
 thesis/temp/
 presentation/temp/
-benchmark/result/ 
+benchmark/result/
+target/
 
 #################
 ## Eclipse

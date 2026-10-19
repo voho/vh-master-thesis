@@ -1,0 +1,20 @@
+\begin{table}
+\centering
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Benchmark & target [\%] & improved POEMS & LA-POEMS \\
+\midrule
+apte & 0.78 & 0.2 & 0.0 \\
+xerox & 3.16 & 0.5 & 0.3 \\
+hp & 4.58 & 13.7 & 0.1 \\
+ami33 & 3.47 & 4.0 & 9.6 \\
+ami49 & 3.87 & 2.2 & 15.4 \\
+n100 & 4.91 & 2.6 & 23.6 \\
+n200 & 10.02 & 1.4 & 21.7 \\
+n300 & 11.15 & 0.7 & 24.5 \\
+\bottomrule
+\end{tabular}
+\caption{Median time [s] in which the improved POEMS and LA-POEMS first reach the median final dead space of the original POEMS (the target, 60\,s runs, seeds 101--108; -- = not reached by half of the runs)}
+\label{tab:ttt}
+\end{table}

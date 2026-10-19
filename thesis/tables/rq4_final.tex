@@ -1,0 +1,22 @@
+\begin{table}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccrr@{}}
+\toprule
+ &  &  &  & \multicolumn{2}{c}{$\hat{A}_{12}$ of LA-POEMS vs.} \\
+Benchmark & original & improved & LA-POEMS & original & improved \\
+\midrule
+apte & $0.78_{\pm 0.00}\ (0.78)$ & $0.78_{\pm 0.00}\ (0.78)$ & $0.78_{\pm 0.00}\ (0.78)$ & 0.50 & 0.50 \\
+xerox & $3.23_{\pm 0.16}\ (3.16)$ & $\mathbf{2.85_{\pm 0.39}\ (2.34)}$ & $\mathbf{2.32_{\pm 0.02}\ (2.30)}$ & 1.00 & 0.91 \\
+hp & $4.57_{\pm 1.23}\ (2.28)$ & $\mathbf{2.13_{\pm 1.46}\ (1.32)}$ & $1.62_{\pm 0.79}\ (1.32)$ & 0.98 & 0.58 \\
+ami33 & $3.31_{\pm 0.56}\ (2.33)$ & $\mathbf{1.86_{\pm 0.36}\ (1.37)}$ & $\mathbf{1.16_{\pm 0.40}\ (0.63)}$ & 1.00 & 0.91 \\
+ami49 & $3.96_{\pm 0.44}\ (3.46)$ & $\mathbf{2.14_{\pm 0.59}\ (1.65)}$ & $1.69_{\pm 0.34}\ (1.36)$ & 1.00 & 0.80 \\
+n100 & $4.97_{\pm 0.18}\ (4.69)$ & $\mathbf{2.41_{\pm 0.21}\ (2.06)}$ & $\mathbf{2.15_{\pm 0.17}\ (1.95)}$ & 1.00 & 0.83 \\
+n200 & $10.02_{\pm 0.76}\ (9.01)$ & $\mathbf{4.18_{\pm 0.29}\ (3.82)}$ & $\mathbf{2.75_{\pm 0.32}\ (2.47)}$ & 1.00 & 1.00 \\
+n300 & $11.01_{\pm 0.65}\ (10.15)$ & $\mathbf{5.06_{\pm 0.21}\ (4.74)}$ & $\mathbf{3.39_{\pm 0.36}\ (2.90)}$ & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\caption{Final comparison of the original POEMS, the improved POEMS and LA-POEMS on the tuning benchmarks (dead space [\%], 60\,s, seeds 101--108; mean, standard deviation and best run). Each algorithm is tested against the column to its left; the last columns give the probability that a run of LA-POEMS ends with less dead space than a run of the other algorithm}
+\label{tab:final}
+\end{table}

@@ -1,0 +1,44 @@
+\section{RQ4: Final Comparison}
+\label{sec:rq4}
+
+The final comparison runs three algorithms for 60 seconds with seeds that were not used before: the original implementation of POEMS with the parameters of the original edition ({\em original POEMS}), POEMS with the corrections, the array evaluation and the modifications chosen in Section~\ref{sec:rq2} ({\em improved POEMS}), and LA-POEMS in the configuration chosen in Section~\ref{sec:rq3}. The held-out instances were not used before this comparison.
+
+\subsection{Tuning Benchmarks}
+
+Table~\ref{tab:final} shows the results on the eight benchmarks used for tuning. All three algorithms find the same floorplan of apte (0.78\,\%) in every run. On the other seven benchmarks, LA-POEMS is significantly better than the original POEMS, with $\hat{A}_{12} \geq 0.98$: almost every run of LA-POEMS ends with less dead space than every run of the original algorithm. It reduces the mean dead space by 28\,\% on xerox, by 57--65\,\% on hp, ami33, ami49 and n100 and by 69--73\,\% on n200 and n300, from 10--11\,\% to 2.8--3.4\,\%. It finds the best known floorplan of hp (1.32\,\%) in seven of eight runs and that of xerox (2.30\,\%) in four. The improved POEMS, which differs from the original algorithm by the corrections, the faster evaluation and $G = 100$, is itself significantly better than the original POEMS on all seven benchmarks: it reduces the dead space by 44--58\,\% on six of them and by 12\,\% on xerox. LA-POEMS is significantly better than the improved POEMS on five benchmarks, by 11--38\,\% ($\hat{A}_{12} = 0.83$--$1$), and better but not significantly on hp and ami49 ($\hat{A}_{12} = 0.58$ and 0.80).
+
+\input{tables/rq4_final}
+
+\subsection{Held-Out Benchmarks}
+
+Table~\ref{tab:heldout} shows the results on the six held-out instances, which were not used during the development of any of the algorithms. The picture is the same as on the tuning benchmarks. On the four instances with 100 and 200 modules, LA-POEMS is significantly better than the original POEMS in every comparison of runs ($\hat{A}_{12} = 1$) and reduces the dead space by 63--73\,\%. On the two small instances, n30b and n50b, its mean dead space is lower by 27 and 37\,\% ($\hat{A}_{12}$ = 0.72 and 0.88), but with five runs the differences are not significant. The improved POEMS is significantly better than the original POEMS on the four larger instances, by 54--60\,\%. LA-POEMS is significantly better than the improved POEMS on n30b, n100b, n200b and n200c, by 18--35\,\% ($\hat{A}_{12} \geq 0.92$). On n100c, it is better by 17\,\%, but not significantly, and on n50b the improved POEMS has the lower mean (1.70 against 1.85\,\%), also not significantly.
+
+\input{tables/rq4_heldout}
+
+\subsection{Convergence}
+
+Fig.~\ref{fig:convergence} shows how the best floorplan improves during the runs, and Table~\ref{tab:ttt} how long the improved POEMS and LA-POEMS need to reach the final quality of the original POEMS. The original POEMS improves steadily from its first iteration. The improved POEMS starts much faster and reaches the 60-second result of the original algorithm within 0.2--4 seconds on all benchmarks except hp (14 seconds). LA-POEMS keeps its best floorplan close to the prototype during the first part of the run: at the high initial temperature, simulated annealing accepts many deteriorations, and the current floorplan is mostly worse than the prototype. As the temperature decreases, the best floorplan improves quickly. On ami33, ami49 and the GSRC instances, LA-POEMS reaches the target after 10--25 seconds and overtakes the improved POEMS after 15--34 seconds; on apte, xerox and hp, it reaches the target within half a second. LA-POEMS with simulated annealing is therefore not an anytime algorithm: its cooling schedule is fitted to the time budget, which has to be known in advance, and a run stopped early returns a poor floorplan. When a run may be stopped at any time, the improved POEMS or late acceptance (Section~\ref{sec:rq3}), which improve the best floorplan continuously, are the better choice.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{new/convergence}
+\caption{Convergence of the three algorithms on ami49, n100 and n300: median dead space of the best floorplan found so far over the 8 runs (seeds 101--108), with the interquartile range shaded; logarithmic time axis}
+\label{fig:convergence}
+\end{figure}
+
+\input{tables/rq4_ttt}
+
+\subsection{Long Runs and Published Results}
+
+Table~\ref{tab:literature} puts the results into the context of the original edition and of published results. The comparison with published results is not controlled (Section~\ref{sec:method}): they were obtained on much slower computers, and their times are given only for orientation. Within 60 seconds, LA-POEMS finds on average less dead space than the longest configuration of the original edition ($I = 20\,000$ iterations), which ran for 12 to 153 minutes on a computer about 1.7 times slower, on every benchmark except apte, where all algorithms find the same floorplan. Its mean dead space is also lower than that of the hard-block packings of CompaSS \cite{compass}, which are computed within seconds, on every benchmark except apte. The B*-Tree with simulated annealing \cite{btree} reports the areas of its floorplans with two decimals. Computed from them, its dead space on apte and hp equals that of the best floorplans of LA-POEMS within the rounding, and on xerox, ami33 and ami49, LA-POEMS finds smaller floorplans on average. Longer runs pay off on the large instances: in five minutes, LA-POEMS reduces the mean dead space on n100, n200 and n300 by another 26--31\,\% compared with the one-minute runs with the same seeds, to 1.66, 2.03 and 2.38\,\% (significantly). On ami33 and ami49, the differences between the one- and the five-minute runs are not significant; on ami33, the mean of the five-minute runs is even higher (1.20 against 1.02\,\%), although their best run reaches 0.84\,\%. The original edition concluded that POEMS outperforms CompaSS on all benchmarks, which its own results did not support for hp (3.88\,\% in its long run against 2.28\,\%). For LA-POEMS, the claim holds on average over one-minute runs on every benchmark except apte, where both find the same floorplan. Fig.~\ref{fig:floorplans} shows the best floorplans found by LA-POEMS.
+
+\input{tables/rq4_literature}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{new/floorplans}
+\caption{The best floorplans found by LA-POEMS in the final comparison and in the long runs, with the dead space in gray (the longer side is drawn horizontally). The objective does not constrain the aspect ratio, so some floorplans, such as that of apte, are long strips}
+\label{fig:floorplans}
+\end{figure}
+
+\paragraph{Answer to RQ4.} With the same time budget of one minute and new seeds, both new algorithms are much better than the original POEMS. The improved POEMS reduces its mean dead space by 44--58\,\% on the tuning instances with 11 or more modules, and LA-POEMS by 57--73\,\% on those with 33 or more modules. LA-POEMS is significantly better than the improved POEMS on five of the seven non-trivial tuning benchmarks and on four of the six held-out instances, and it is not significantly worse on any instance. The advantage has a price: with simulated annealing, the best floorplan improves mainly in the second half of the run, so the time budget must be known in advance. Five-minute runs reduce the dead space on the three largest instances by another 26--31\,\%. Within one minute, LA-POEMS finds on average less dead space than the original edition after up to 2.5 hours and than the published results of CompaSS on every benchmark except apte, where all algorithms find the same floorplan; compared with the B*-Tree with simulated annealing, its best floorplans are equal on apte and hp and smaller on the other three MCNC benchmarks.

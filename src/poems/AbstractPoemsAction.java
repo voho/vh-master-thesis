@@ -7,8 +7,11 @@ import poems.action2.ExchangeValuePoemsAction;
 import poems.action2.FlipPoemsAction;
 import poems.action2.MirrorPoemsAction;
 import poems.action3.HangNodePoemsAction;
+import poems.action3.MoveNodePoemsAction;
 import program.Logger;
+import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 
@@ -63,6 +66,41 @@ abstract public class AbstractPoemsAction
   }
   
   /**
+   * Returns the signature of the action. Two actions with the same signature
+   * modify the tree in the same way (with a negligible probability of a hash
+   * collision). All disabled actions have the signature 0.
+   * 
+   * @return the action signature
+   */
+  public long getSignature()
+  {
+    return this.enabled
+        ? this.getActiveSignature()
+        : 0;
+  }
+  
+  /**
+   * Returns the signature of the action when active.
+   * 
+   * @return the signature
+   */
+  abstract protected long getActiveSignature();
+  
+  /**
+   * Combines the hash with the next value.
+   * 
+   * @param hash hash
+   * @param value next value
+   * @return combined hash
+   */
+  protected static long hash(final long hash, final long value)
+  {
+    long h = (hash ^ value) * 0x9E3779B97F4A7C15L;
+    h ^= (h >>> 29);
+    return h;
+  }
+  
+  /**
    * Applies the action to input and produces the output.
    * 
    * @param input input tree
@@ -85,6 +123,28 @@ abstract public class AbstractPoemsAction
    * @return output tree
    */
   abstract protected BTree<NumberedValue<Module>> applyActive(final BTree<NumberedValue<Module>> input);
+  
+  /**
+   * Applies the action to the array B*-Tree (the tree is modified in place).
+   * The result is the same as when the action is applied to the immutable
+   * B*-Tree.
+   * 
+   * @param tree tree to modify
+   */
+  final public void apply(final ArrayBTree tree)
+  {
+    if (this.enabled)
+    {
+      this.applyActive(tree);
+    }
+  }
+  
+  /**
+   * Applies the action to the array B*-Tree (the tree is modified in place).
+   * 
+   * @param tree tree to modify
+   */
+  abstract protected void applyActive(final ArrayBTree tree);
   
   /**
    * Creates a random action based on this action.
@@ -123,7 +183,9 @@ abstract public class AbstractPoemsAction
   {
     final AbstractPoemsAction action;
     
-    switch (Utility.random(0, 5))
+    switch (Utility.random(0, Setup.MOVE_ACTION
+        ? 6
+        : 5))
     {
     case 0:
       action = FlipPoemsAction.random(enabled, lastNumber);
@@ -142,6 +204,9 @@ abstract public class AbstractPoemsAction
       break;
     case 5:
       action = HangNodePoemsAction.random(enabled, lastNumber);
+      break;
+    case 6:
+      action = MoveNodePoemsAction.random(enabled, lastNumber);
       break;
     default:
       throw new IndexOutOfBoundsException();

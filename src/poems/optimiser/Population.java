@@ -1,6 +1,11 @@
 package poems.optimiser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import module.Module;
+import poems.PoemsActionSequence;
+import poems.PoemsActionSequencePair;
 import program.Logger;
 import program.Setup;
 import program.Utility;
@@ -34,6 +39,10 @@ public class Population
    * population (array of individuals)
    */
   private final Individual population[];
+  /**
+   * number of individuals with each sequence signature (deduplication only)
+   */
+  private final Map<Long, Integer> signatures;
   
   /**
    * Creates a new instance.
@@ -50,6 +59,9 @@ public class Population
     this.nicheCount = nicheCount;
     this.nicheSize = nicheSize;
     this.population = new Individual[nicheCount * nicheSize];
+    this.signatures = Setup.DEDUPLICATE
+        ? new HashMap<Long, Integer>()
+        : null;
     
     int index = 0;
     
@@ -64,10 +76,10 @@ public class Population
         // n = niche (= count of active actions)
         // i = number of individual in the niche
         
-        this.population[index++] = Individual.random(
+        this.put(index++, Individual.random(
             prototype,
             nicheCount,
-            n);
+            n));
       }
     }
   }
@@ -80,11 +92,41 @@ public class Population
    */
   public Individual evolve(final int generations)
   {
+    return this.evolve(generations, Long.MAX_VALUE);
+  }
+  
+  /**
+   * Starts an evolution and returns the best individual found. The evolution
+   * is stopped early when the deadline is reached.
+   * 
+   * @param generations generation count
+   * @param deadline time (in milliseconds) when the evolution must stop
+   * @return the best individual
+   */
+  public Individual evolve(final int generations, final long deadline)
+  {
+    return this.evolve(generations, deadline, Integer.MAX_VALUE);
+  }
+  
+  /**
+   * Starts an evolution and returns the best individual found. The evolution
+   * is stopped early when the deadline is reached, when the best individual
+   * does not improve for a given number of generations (if enabled) or when
+   * an individual better than the target is found (if enabled).
+   * 
+   * @param generations generation count
+   * @param deadline time (in milliseconds) when the evolution must stop
+   * @param target fitness of the prototype
+   * @return the best individual
+   */
+  public Individual evolve(final int generations, final long deadline, final int target)
+  {
     Population.LOG.log("Starting genetic algorithm with %d generations...", generations);
     
     Individual best = null;
+    int improved = 0;
     
-    for (int ig = 0; ig < generations; ig++)
+    for (int ig = 0; (ig < generations) && ((best == null) || (System.currentTimeMillis() < deadline)); ig++)
     {
       Population.LOG.log("GENERATION %d", ig + 1);
       
@@ -110,7 +152,7 @@ public class Population
       
       // in each generation, create new individual(s)
       
-      if (Math.random() < Setup.PROB_CROSSOVER)
+      if (Utility.randomDouble() < Setup.PROB_CROSSOVER)
       {
         // by crossover
         
@@ -119,13 +161,12 @@ public class Population
         final Individual mother = this.select(low, high);
         final Individual father = this.select(low, high);
         
-        final IndividualPair children = Individual.crossover(
-            this.prototype,
-            mother,
-            father);
+        final PoemsActionSequencePair children = PoemsActionSequence.crossover(
+            mother.getSequence(),
+            father.getSequence());
         
-        this.accept(children.getFirst());
-        this.accept(children.getSecond());
+        this.offer(children.getFirst());
+        this.offer(children.getSecond());
       }
       else
       {
@@ -135,11 +176,9 @@ public class Population
         
         final Individual mutant = this.select(low, high);
         
-        final Individual child = Individual.mutate(
-            this.prototype,
-            mutant);
-        
-        this.accept(child);
+        this.offer(PoemsActionSequence.mutate(
+            this.prototype.getValue().getLastNumber(),
+            mutant.getSequence()));
       }
       
       final Individual newBest = this.pickBest();
@@ -147,6 +186,19 @@ public class Population
       if ((best == null) || newBest.isBetter(best))
       {
         best = newBest;
+        improved = ig;
+      }
+      
+      if ((Setup.PATIENCE > 0) && (ig - improved >= Setup.PATIENCE))
+      {
+        Population.LOG.log("No improvement for %d generations, stopping...", Integer.valueOf(Setup.PATIENCE));
+        break;
+      }
+      
+      if (Setup.FIRST_IMPROVEMENT && (best.getFitness() > target))
+      {
+        Population.LOG.log("Prototype improved, stopping...");
+        break;
       }
     }
     
@@ -157,6 +209,25 @@ public class Population
     Population.LOG.log("Evolution finished, returning best...");
     
     return best;
+  }
+  
+  /**
+   * Offers a new action sequence to the population. The sequence is applied
+   * to the prototype, evaluated and accepted (depending on its fitness). If
+   * deduplication is enabled and the population already contains the same
+   * sequence, it is thrown away without evaluation.
+   * 
+   * @param sequence new action sequence
+   */
+  private void offer(final PoemsActionSequence sequence)
+  {
+    if (Setup.DEDUPLICATE && (sequence.getNiche() > 0) && this.signatures.containsKey(Long.valueOf(sequence.getSignature())))
+    {
+      Population.LOG.log("Duplicate sequence thrown away: %s", sequence);
+      return;
+    }
+    
+    this.accept(Individual.create(this.prototype, sequence));
   }
   
   /**
@@ -197,7 +268,7 @@ public class Population
    */
   private void replaceWorse(final Individual fresh)
   {
-    Population.LOG.log("Replacing worse by %s...", fresh.toString());
+    Population.LOG.log("Replacing worse by %s...", fresh);
     
     for (int i = 0; i <= Population.getNicheHigh(fresh.getNiche(), this.nicheSize); i++)
     {
@@ -207,12 +278,48 @@ public class Population
         
         Population.LOG.log("Replacing worse victim at %d...", i);
         
-        this.population[i] = fresh;
+        this.put(i, fresh);
         return;
       }
     }
     
     Population.LOG.log("No worse victim found.");
+  }
+  
+  /**
+   * Puts the individual to the population at the given index.
+   * 
+   * @param index index
+   * @param individual individual
+   */
+  private void put(final int index, final Individual individual)
+  {
+    if (this.signatures != null)
+    {
+      if (this.population[index] != null)
+      {
+        final Long old = Long.valueOf(this.population[index].getSequence().getSignature());
+        final int count = this.signatures.get(old).intValue();
+        
+        if (count == 1)
+        {
+          this.signatures.remove(old);
+        }
+        else
+        {
+          this.signatures.put(old, Integer.valueOf(count - 1));
+        }
+      }
+      
+      final Long key = Long.valueOf(individual.getSequence().getSignature());
+      final Integer count = this.signatures.get(key);
+      
+      this.signatures.put(key, Integer.valueOf((count == null)
+          ? 1
+          : count.intValue() + 1));
+    }
+    
+    this.population[index] = individual;
   }
   
   /**
@@ -294,8 +401,8 @@ public class Population
       return null;
     }
     
-    Population.LOG.log("Best individual found: %s", best.toString());
-    Population.LOG.log("Best fitness: " + best.getFitness());
+    Population.LOG.log("Best individual found: %s", best);
+    Population.LOG.log("Best fitness: %d", Integer.valueOf(best.getFitness()));
     
     return best;
   }

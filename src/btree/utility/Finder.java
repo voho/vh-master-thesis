@@ -30,16 +30,48 @@ public class Finder
    */
   public static <T extends NumberedValue<?>> BTree<T> find(final BTree<T> input, final int n)
   {
-    for (final BTree<T> temp : input)
+    final BTree<T> result = Finder.search(input, n);
+    
+    if (result == null)
     {
-      if (temp.getValue().hasNumber(n))
+      throw new NoSuchElementException(String.format("Number %d was not found in tree %s.", n, input.toString()));
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Finds a subtree with the given number.
+   * 
+   * @param <T> value class
+   * @param input input B*-Tree
+   * @param n searched number
+   * @return a subtree with the given number or NULL if there is none
+   */
+  private static <T extends NumberedValue<?>> BTree<T> search(final BTree<T> input, final int n)
+  {
+    if (input.getValue().hasNumber(n))
+    {
+      // node with the searched number was found
+      return input;
+    }
+    
+    if (input.hasLeft())
+    {
+      final BTree<T> result = Finder.search(input.getLeft(), n);
+      
+      if (result != null)
       {
-        // node with the searched number was found
-        return temp;
+        return result;
       }
     }
     
-    throw new NoSuchElementException(String.format("Number %d was not found in tree %s.", n, input.toString()));
+    if (input.hasRight())
+    {
+      return Finder.search(input.getRight(), n);
+    }
+    
+    return null;
   }
   
   /**
@@ -53,15 +85,17 @@ public class Finder
    */
   public static boolean contains(final BTree<?> haystack, final BTree<?> needle)
   {
-    for (final BTree<?> temp : haystack)
+    if (haystack.equals(needle))
     {
-      if (temp.equals(needle))
-      {
-        return true;
-      }
+      return true;
     }
     
-    return false;
+    if (haystack.hasLeft() && Finder.contains(haystack.getLeft(), needle))
+    {
+      return true;
+    }
+    
+    return haystack.hasRight() && Finder.contains(haystack.getRight(), needle);
   }
   
   /**

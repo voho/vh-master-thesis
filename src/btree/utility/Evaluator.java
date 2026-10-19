@@ -2,6 +2,7 @@ package btree.utility;
 
 import module.PlacedModule;
 import btree.BTree;
+import btree.NumberedValue;
 
 /**
  * Floorplan evaluator.
@@ -33,7 +34,7 @@ final public class Evaluator
       throw new NullPointerException("Cannot compare tree with a NULL value.");
     }
     
-    if (!a.getValue().equals(b.getValue()))
+    if (!Evaluator.equalValues(a.getValue(), b.getValue()))
     {
       // values differ
       return false;
@@ -67,6 +68,30 @@ final public class Evaluator
   }
   
   /**
+   * Checks if two B*-Tree values equal each other. Numbered values are equal
+   * only if they contain equal values, so a rotated module is not considered
+   * to be the same as the original one.
+   * 
+   * @param a first value
+   * @param b second value
+   * @return TRUE if both values equal, FALSE otherwise
+   */
+  private static boolean equalValues(final Object a, final Object b)
+  {
+    if (!a.equals(b))
+    {
+      return false;
+    }
+    
+    if ((a instanceof NumberedValue<?>) && (b instanceof NumberedValue<?>))
+    {
+      return ((NumberedValue<?>) a).getValue().equals(((NumberedValue<?>) b).getValue());
+    }
+    
+    return true;
+  }
+  
+  /**
    * Evaluater a quality of a floorplan.
    * 
    * @param btree input floorplan in the form of B*-Tree
@@ -74,17 +99,35 @@ final public class Evaluator
    */
   public static Evaluation evaluate(final BTree<PlacedModule> btree)
   {
-    int xmax = 0;
-    int ymax = 0;
-    int area = 0;
+    final int[] box = new int[3];
     
-    for (final BTree<PlacedModule> node : btree)
+    Evaluator.evaluate(btree, box);
+    
+    return new Evaluation(box[0], box[1], box[2]);
+  }
+  
+  /**
+   * Updates the bounding box and the used area by the given subtree.
+   * 
+   * @param btree subtree
+   * @param box maximal X, maximal Y and the used area (updated)
+   */
+  private static void evaluate(final BTree<PlacedModule> btree, final int[] box)
+  {
+    final PlacedModule node = btree.getValue();
+    
+    box[0] = Math.max(box[0], node.getMaxPosition().getX());
+    box[1] = Math.max(box[1], node.getMaxPosition().getY());
+    box[2] += node.getModule().getArea();
+    
+    if (btree.hasLeft())
     {
-      xmax = Math.max(xmax, node.getValue().getMaxPosition().getX());
-      ymax = Math.max(ymax, node.getValue().getMaxPosition().getY());
-      area += node.getValue().getModule().getArea();
+      Evaluator.evaluate(btree.getLeft(), box);
     }
     
-    return new Evaluation(xmax, ymax, area);
+    if (btree.hasRight())
+    {
+      Evaluator.evaluate(btree.getRight(), box);
+    }
   }
 }

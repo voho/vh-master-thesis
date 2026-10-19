@@ -1,0 +1,33 @@
+\chapter{Conclusions}
+\label{sec:conclusions}
+
+\section{Summary}
+
+The thesis studied the minimisation of the area of the enclosing rectangle of rotatable rectangular modules, represented by B*-Trees and optimised by POEMS, an iterative algorithm that evolves sequences of tree modifications by a genetic algorithm. The revised edition re-examined the original work and extended it in four ways.
+
+First, the implementation was profiled and made 7.5 to 29 times faster without changing its results. The original placement was superlinear, and most of the remaining time went to temporary objects and to the formatting of discarded messages. Within equal time, the faster implementation alone finds significantly better floorplans on all larger benchmarks (RQ1).
+
+Second, seven defects were found and corrected; the most important one prevented rotating a module by itself. Instrumentation showed that the genetic algorithm of POEMS wastes most of its evaluations: almost half of its children duplicate individuals of the population, the step applied in an iteration is usually found among the first individuals, and most iterations only move along a plateau of the objective. Of the modifications of the genetic algorithm, only shorter iterations helped: with 100 instead of 1000 generations, POEMS makes 5.6 times more iterations and is significantly better on four of seven benchmarks (RQ2).
+
+Third, late acceptance POEMS keeps the representation, the actions and the action sequences of POEMS, but applies random sequences immediately and accepts them by late acceptance or simulated annealing. On the same implementation and with the same time, it is significantly better than POEMS on most instances and worse on none, so the genetic algorithm is not necessary for finding good steps. The acceptance criterion is the most important design choice; the final configuration uses simulated annealing, steps of at most two actions and local partners (RQ3).
+
+Fourth, the algorithms were compared with equal time budgets, new seeds, held-out instances and non-parametric statistics. Within one minute, LA-POEMS reduced the dead space of the original POEMS by 57--73\,\% on the instances with 33 to 300 modules and was significantly better than the improved POEMS on five of seven tuning benchmarks and on four of six held-out instances. Its results are as good as or better than those of the original edition after up to 2.5 hours and the published results of CompaSS, and its best floorplans are at least as good as those of the B*-Tree with simulated annealing. The price of simulated annealing is that the time budget must be known in advance (RQ4).
+
+\section{Lessons}
+
+\begin{itemize}
+\item {\em Measure the implementation before the algorithm.} Implementation overhead changed the results of POEMS more than most algorithmic modifications, so conclusions about an algorithm drawn from a slow implementation can be misleading.
+\item {\em Look at what the evolutionary algorithm does, not only at its result.} Simple counters (duplicates, generation of the best individual, outcome of iterations) revealed that most of the work of the genetic algorithm did not influence the result.
+\item {\em Compare with a simple baseline on the same representation.} Applying the same actions with a simple acceptance criterion turned out to be a stronger algorithm than the original method; without this baseline, the merit of the genetic algorithm cannot be judged.
+\item {\em Use equal budgets, several seeds and statistical tests.} Several differences that looked convincing in single runs disappeared over six or eight seeds, and some modifications helped on one group of instances and hurt on another.
+\end{itemize}
+
+\section{Future Work}
+
+\begin{itemize}
+\item {\bf Fixed-outline floorplanning and wire length.} Practical floorplanners place the modules into a given outline and minimise the wire length \cite{adya,btreesa}. Both objectives can be added to LA-POEMS through the cost of a candidate, and the early termination of the placement still applies to the outline constraint.
+\item {\bf Incremental evaluation.} After a local modification, only the modules placed after the first changed node in the depth-first order move. Keeping the contour at checkpoints of the traversal could avoid repeating the placement of the unchanged prefix.
+\item {\bf Parallel search.} Independent runs of LA-POEMS, or runs that periodically exchange their best solutions, would use all cores of a modern computer.
+\item {\bf Evolution of the steps revisited.} The genetic algorithm of POEMS could be used as an occasional escape mechanism of LA-POEMS from deep local optima, or it could evolve the parameters of the distribution of the steps instead of the steps themselves.
+\item {\bf Soft and rectilinear modules}, which B*-Trees support \cite{btree}, as suggested in the original edition.
+\end{itemize}

@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -67,6 +68,12 @@ public class ExchangeNodePoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(3, Math.min(this.node1, this.node2)), Math.max(this.node1, this.node2));
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("xchangenode(%d,%d)", this.node1, this.node2);
@@ -122,5 +129,11 @@ public class ExchangeNodePoemsAction extends AbstractPoemsAction
                 module1,
                 module2)
             : null);
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.exchangeNodes(this.node1, this.node2);
   }
 }

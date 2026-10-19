@@ -37,14 +37,17 @@ public class PrototyperTest
     final Module g = new Module("G", 2, 12);
     final Module h = new Module("H", 1, 24);
     
-    final BTree<Module> ht = new BTree<Module>(h.flip(), null, null);
-    final BTree<Module> gt = new BTree<Module>(g.flip(), null, null);
-    final BTree<Module> ft = new BTree<Module>(f.flip(), null, null);
+    // modules are rotated to be wider than higher and sorted by width
+    // (descending), then height (descending): H* G* A B C F* D E*
+    
     final BTree<Module> et = new BTree<Module>(e.flip(), null, null);
-    final BTree<Module> dt = new BTree<Module>(d, ht, null);
-    final BTree<Module> ct = new BTree<Module>(c, ft, gt);
-    final BTree<Module> bt = new BTree<Module>(b, dt, et);
-    final BTree<Module> at = new BTree<Module>(a, bt, ct);
+    final BTree<Module> dt = new BTree<Module>(d, null, null);
+    final BTree<Module> ft = new BTree<Module>(f.flip(), null, null);
+    final BTree<Module> ct = new BTree<Module>(c, null, null);
+    final BTree<Module> bt = new BTree<Module>(b, et, null);
+    final BTree<Module> at = new BTree<Module>(a, ft, dt);
+    final BTree<Module> gt = new BTree<Module>(g.flip(), bt, ct);
+    final BTree<Module> ht = new BTree<Module>(h.flip(), gt, at);
     
     modules.add(a);
     modules.add(b);
@@ -56,7 +59,7 @@ public class PrototyperTest
     modules.add(h);
     
     final BTree<Module> p = Prototyper.createCompleteTree(modules);
-    TestUtility.testTree(p, et, bt, gt, ct, ht, ft, at, dt);
+    TestUtility.testTree(p, et, bt, ct, gt, ft, dt, at, ht);
   }
   
   /**

@@ -4,6 +4,7 @@ import module.Module;
 import poems.AbstractPoemsAction;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Finder;
@@ -67,6 +68,14 @@ public class HangNodePoemsAction extends AbstractPoemsAction
             Utility.randomBoolean(Setup.PROB_ACTION_PARAM_CHANGE) ? lastNumber / 2 : 0,
             lastNumber),
         lastNumber);
+  }
+  
+  @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(AbstractPoemsAction.hash(6, this.left
+        ? 1
+        : 0), this.node1), this.node2);
   }
   
   @Override
@@ -155,5 +164,11 @@ public class HangNodePoemsAction extends AbstractPoemsAction
                   left)
               : null);
     }
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    tree.hang(this.node1, this.node2, this.left);
   }
 }

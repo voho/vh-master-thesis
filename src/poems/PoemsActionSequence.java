@@ -6,6 +6,7 @@ import module.Module;
 import program.Logger;
 import program.Setup;
 import program.Utility;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 
@@ -115,7 +116,7 @@ public class PoemsActionSequence extends AbstractPoemsAction
     PoemsActionSequence.LOG.log("Creating a sequence by mutation...");
     PoemsActionSequence.LOG.log("Parent: %s", parent);
     
-    if (Math.random() < Setup.PROB_BIG_ACTION_CHANGE)
+    if (Utility.randomDouble() < Setup.PROB_BIG_ACTION_CHANGE)
     {
       // mutate actions
       
@@ -197,7 +198,7 @@ public class PoemsActionSequence extends AbstractPoemsAction
   {
     super(true);
     
-    PoemsActionSequence.LOG.log("Creating a new sequence: %s", newActions.toString());
+    PoemsActionSequence.LOG.log("Creating a new sequence: %s", Arrays.asList(newActions));
     
     // save the action array
     
@@ -240,6 +241,22 @@ public class PoemsActionSequence extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    long signature = 0;
+    
+    for (final AbstractPoemsAction action : this.actions)
+    {
+      if (action.isEnabled())
+      {
+        signature = AbstractPoemsAction.hash(signature, action.getSignature());
+      }
+    }
+    
+    return signature;
+  }
+  
+  @Override
   protected String toActiveString()
   {
     return "N" + this.niche + ": " + Arrays.toString(this.actions);
@@ -249,6 +266,15 @@ public class PoemsActionSequence extends AbstractPoemsAction
   public String toString()
   {
     return this.toActiveString();
+  }
+  
+  @Override
+  protected void applyActive(final ArrayBTree tree)
+  {
+    for (final AbstractPoemsAction action : this.actions)
+    {
+      action.apply(tree);
+    }
   }
   
   @Override

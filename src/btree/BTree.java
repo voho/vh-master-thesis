@@ -1,9 +1,8 @@
 package btree;
 
-import java.util.Deque;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.List;
 
 /**
  * Immutable class for representing a B*-Tree.
@@ -136,31 +135,35 @@ public class BTree<V extends BTreeValue> implements Iterable<BTree<V>>
   @Override
   public Iterator<BTree<V>> iterator()
   {
-    final Stack<BTree<V>> stack = new Stack<BTree<V>>();
-    final Deque<BTree<V>> queue = new LinkedList<BTree<V>>();
+    final List<BTree<V>> list = new ArrayList<BTree<V>>(this.size);
     
-    stack.push(this);
+    // this is a DFS enumeration (post-order)
     
-    // this is a DFS enumeration
+    BTree.collect(this, list);
     
-    while (!stack.isEmpty())
+    return list.iterator();
+  }
+  
+  /**
+   * Adds all nodes of the subtree to the list in post-order.
+   * 
+   * @param <V> value class
+   * @param node subtree root
+   * @param list output list
+   */
+  private static <V extends BTreeValue> void collect(final BTree<V> node, final List<BTree<V>> list)
+  {
+    if (node.left != null)
     {
-      final BTree<V> parent = stack.pop();
-      
-      queue.addFirst(parent);
-      
-      if (parent.hasLeft())
-      {
-        stack.push(parent.getLeft());
-      }
-      
-      if (parent.hasRight())
-      {
-        stack.push(parent.getRight());
-      }
+      BTree.collect(node.left, list);
     }
     
-    return queue.iterator();
+    if (node.right != null)
+    {
+      BTree.collect(node.right, list);
+    }
+    
+    list.add(node);
   }
   
   @Override

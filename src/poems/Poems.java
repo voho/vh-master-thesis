@@ -1,5 +1,6 @@
 package poems;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import module.Module;
@@ -23,6 +24,10 @@ final public class Poems
    * logger instance
    */
   private static final Logger LOG = Logger.create(Poems.class);
+  /**
+   * number of iterations done in the last run
+   */
+  private static int iterations = 0;
   
   /**
    * Creates a new instance.
@@ -65,46 +70,83 @@ final public class Poems
     
     Logger.prototype(prototype);
     
-    Individual best = null;
+    // the prototype is the best solution so far
     
-    for (int ii = 0; ii < i; ii++)
+    Individual best = Individual.prototype(prototype, n);
+    Individual current = best;
+    
+    Logger.trace(-best.getFitness());
+    
+    // fitness history for the late acceptance (if enabled)
+    
+    final int[] history = new int[Math.max(1, Setup.LATE_ACCEPTANCE)];
+    Arrays.fill(history, current.getFitness());
+    
+    final long deadline = (Setup.TIME_LIMIT > 0)
+        ? System.currentTimeMillis() + Setup.TIME_LIMIT
+        : Long.MAX_VALUE;
+    
+    Poems.iterations = 0;
+    
+    for (int ii = 0; (ii < i) && (System.currentTimeMillis() < deadline); ii++)
     {
+      Poems.iterations++;
+      
       Poems.LOG.log("ITERATION %d", ii + 1);
       
       // create a new population
       
       final Population population = new Population(
-          best == null
-              ? prototype
-              : best.getBuildPlan(),
-              n,
-              s);
+          current.getBuildPlan(),
+          n,
+          s);
       
       // optimise the prototype
       
-      final Individual temp = population.evolve(g);
+      final Individual temp = population.evolve(g, deadline, current.getFitness());
       
-      Poems.LOG.log("Iteration %d brought: %s", ii, temp.toString());
+      Poems.LOG.log("Iteration %d brought: %s", ii, temp);
       
       // print new prototype if better
       
       Logger.iterated(temp);
       
-      if ((best == null) || temp.isBetter(best))
+      if (temp.isBetter(best))
       {
         Logger.improvement(temp, ii);
+        Logger.trace(-temp.getFitness());
       }
       
-      // replace old prototype if new better of equal
+      // replace old prototype if new better or equal (or if not worse than
+      // the prototype several iterations ago, if late acceptance is enabled)
       
-      if ((best == null) || temp.isBetterOrEqual(best))
+      final int slot = ii % history.length;
+      
+      if (temp.isBetterOrEqual(current) || ((Setup.LATE_ACCEPTANCE > 0) && (temp.getFitness() >= history[slot])))
       {
-        Poems.LOG.log("Better prototype found: %s", temp);
+        Poems.LOG.log("New prototype accepted: %s", temp);
         
-        best = temp;
+        current = temp;
+      }
+      
+      history[slot] = current.getFitness();
+      
+      if (current.isBetterOrEqual(best))
+      {
+        best = current;
       }
     }
     
     return best;
+  }
+  
+  /**
+   * Returns the number of iterations done in the last run.
+   * 
+   * @return the number of iterations
+   */
+  public static int getIterations()
+  {
+    return Poems.iterations;
   }
 }

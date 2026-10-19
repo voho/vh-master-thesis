@@ -1,11 +1,43 @@
 \chapter{Introduction}
+\label{sec:introduction}
 
-In this work, a new algorithm is suggested for solving geometric combinatorial problem, known as {\em floorplanning}. Simply said, the task is to place rectangles on a plane so that the area they take is as small as possible. This problem has many practical and theoretical applications.
+Floorplanning is an early step of the physical design of integrated circuits: the functional blocks (modules) of a chip are placed on the plane so that they do not overlap and so that the chip is as small as possible, possibly subject to further objectives such as the wire length. In its simplest form, which is studied in this thesis, the modules are rectangles of fixed dimensions that may be rotated by 90 degrees, and the only objective is the area of the rectangle enclosing all of them. The same rectangle packing model appears in other domains, for example in scheduling, where the width of a rectangle is the duration of a task and its height the amount of a resource used by it. The decision version of the problem is NP-complete, so practical floorplanners rely on heuristics and metaheuristics.
 
-The new algorithm is based on an iterative stochastic algorithm which uses a genetic algorithm for local search on each iteration, because both algorithms have already proven useful for solving similar problems.
+\section{The Approach of this Thesis}
 
-The algorithm was implemented in the Java programming language and tested on standard benchmarks, available on a public website. The results are very good, compared to the state-of-the-art algorithms. The only weak point is the computational time. It takes much longer to get these results because of the evolutionary and stochastic nature of the algorithm. If one prefers quality to speed, the algorithm presented here is the choice. On the other hand, if the speed is crucial, another algorithm should be used.
+The thesis combines two ideas. Floorplans are represented by {\em B*-Trees} \cite{btree}, ordered binary trees from which a compact placement is computed in linear time. The trees are optimised by {\em POEMS} (Iterative Prototype Optimisation with Evolved Improvement Steps) \cite{poems}: an initial solution, the prototype, is improved in iterations, and in each iteration a genetic algorithm evolves a short sequence of modifications of the prototype ({\em actions}) whose application gives the best solution. The best sequence found in an iteration is applied to the prototype if the result is not worse.
+
+The original edition of the thesis (2011) designed the actions for B*-Trees, implemented the algorithm and reported results on standard benchmarks. This revised edition re-examines that work critically: it profiles and tests the implementation, analyses what the genetic algorithm actually does, corrects the defects it found, improves the original algorithm and proposes a new algorithm derived from it. All experiments were run again with a new methodology: equal time budgets, fixed and independent random seeds, independent validation of every result and non-parametric statistical tests.
+
+\section{Contributions}
+
+\begin{enumerate}
+\item {\bf POEMS for B*-Tree floorplanning} (original edition): a set of actions that modify B*-Trees, action sequences organised into niches by the number of enabled actions, and a steady-state genetic algorithm that evolves them (Chapter~\ref{sec:approach}). The revised edition adds a seventh action, the move of a single node.
+\item {\bf A critical analysis of the original implementation}: profiling (most of the time was spent outside the algorithm), seven defects that changed the behaviour of the algorithm or made parts of it unusable (for example, rotation alone was never applied and a sequence length of one made the program hang), and instrumentation of the genetic algorithm showing that most of its evaluations are wasted (Chapters~\ref{sec:approach} and~\ref{sec:implementation}).
+\item {\bf An efficient implementation}: an amortised linear contour placement, lazy construction of placed trees and an array-based B*-Tree with in-place actions that are tested to produce exactly the same trees as the original ones. POEMS evaluates 7.5 to 29 times more candidate floorplans per second with identical results; the speed-up grows with the number of modules (Chapters~\ref{sec:implementation} and~\ref{sec:testing}).
+\item {\bf Modifications of the genetic algorithm of POEMS}, each evaluated separately: fewer generations per iteration, duplicate elimination, early termination of an iteration, late acceptance of new prototypes and the new action; only shorter iterations improve POEMS (Chapter~\ref{sec:testing}).
+\item {\bf Late acceptance POEMS (LA-POEMS)}, a new algorithm that keeps the representation, the actions and the action sequences of POEMS, but applies random sequences to the prototype immediately and accepts the results by late acceptance hill climbing \cite{lahc} or simulated annealing \cite{sa}, together with an ablation of its design choices (Chapters~\ref{sec:approach} and~\ref{sec:testing}).
+\item {\bf A rigorous experimental comparison} of the original algorithm, the improved POEMS and LA-POEMS with equal time budgets on the tuning benchmarks, on held-out benchmarks and in long runs, and a comparison with the results of the original edition and with the literature (Chapter~\ref{sec:testing}).
+\end{enumerate}
+
+\section{Research Questions}
+
+\begin{description}
+\item[RQ1] How much of the running time of the original implementation is overhead that does not change the computed results, and how does removing it change the quality of solutions found within a given time?
+\item[RQ2] How efficiently does the genetic algorithm of POEMS use its evaluations, and which modifications of POEMS improve its results?
+\item[RQ3] Is evolving the improvement steps by a genetic algorithm necessary, or is it better to apply random steps immediately with a suitable acceptance criterion (LA-POEMS)? Which design choices of LA-POEMS matter?
+\item[RQ4] How do the original algorithm, the improved POEMS and LA-POEMS compare with equal time budgets, on held-out instances, in long runs, and with the results of the original edition and of the literature?
+\end{description}
+
+\section{Summary of Results}
+
+\begin{description}
+\item[RQ1] Most of the running time of the original implementation was overhead. Removing it makes POEMS 4 to 8 times faster with identical results, and the array evaluation 7.5 to 29 times; within the same 30 seconds, the faster implementation alone finds significantly better floorplans on all five benchmarks with more than 30 modules.
+\item[RQ2] Almost half of the children of the genetic algorithm duplicate individuals of the population, the step applied in an iteration is usually present in its initial random population, and at most 3.4\,\% of the iterations improve the prototype. Shorter iterations (fewer generations) make POEMS significantly better on four of seven benchmarks; the other modifications do not help.
+\item[RQ3] With the same actions, implementation and time, random steps accepted by simulated annealing are significantly better than the evolved steps of POEMS on most instances and worse on none. The acceptance criterion matters most; short steps and local partners help on large instances.
+\item[RQ4] With equal time budgets of one minute and new seeds, LA-POEMS reduces the dead space of the original POEMS by 57--73\,\% on the instances with 33 to 300 modules and is significantly better than the improved POEMS on most tuning and held-out instances. Its results are as good as or better than those of the original edition after up to 2.5 hours and the published results of CompaSS, and its best floorplans are at least as good as those of the B*-Tree with simulated annealing; simulated annealing, however, needs to know the time budget in advance.
+\end{description}
 
 \section{Thesis Structure}
 
-The structure of the thesis is as follows. In Chapter~\ref{sec:problem}, the problem assignment is formulated formally and selected most used problem codings are introduced. In Chapter~\ref{sec:approach}, the new approach is proposed for solving the problem and described generally. In Chapter~\ref{sec:implementation}, the proposed algorithm implementation is described in detail, including UML class diagrams. In Chapter~\ref{sec:testing}, various experiments and benchmarks are summarized in tables, and the results are commented. In Section~\ref{sec:conclusions}, conclusions are made and further research suggested. Finally in Chapter~\ref{sec:usage}, the application of the resulting program by means of the command line is described.
+Chapter~\ref{sec:problem} formulates the problem, reviews floorplan representations and the optimisation methods used for floorplanning. Chapter~\ref{sec:approach} describes the B*-Tree placement, POEMS with its actions and genetic algorithm, the analysis of the genetic algorithm, the improvements of POEMS and the new LA-POEMS algorithm. Chapter~\ref{sec:implementation} describes the implementation, its performance engineering, the defects found in the original implementation and the measures taken to ensure correctness and reproducibility. Chapter~\ref{sec:testing} presents the experimental methodology and answers the research questions, and Chapter~\ref{sec:conclusions} concludes the thesis. Appendix~\ref{sec:usage} describes the use of the program and how to reproduce the experiments.
