@@ -64,12 +64,21 @@ public final class LatePoems
 
     final BTree<NumberedValue<Module>> prototype = Numberator.number(Prototyper.createBestFit(modules));
 
-    ArrayBTree current = new ArrayBTree(prototype);
-    ArrayBTree candidate = new ArrayBTree(current);
-    final ArrayBTree best = new ArrayBTree(current);
+    final ArrayBTree start = new ArrayBTree(prototype);
+    ArrayBTree current = new ArrayBTree(start);
+    ArrayBTree candidate = new ArrayBTree(start);
+    final ArrayBTree best = new ArrayBTree(start);
 
-    long currentArea = current.place();
+    final long startArea = start.place();
+    long currentArea = startArea;
     long bestArea = currentArea;
+
+    // the search restarts from the prototype if the best solution of the
+    // current run does not improve for the given number of evaluations
+
+    final long stall = (long) Setup.RESTART * (long) start.size();
+    long runBestArea = currentArea;
+    long runImproved = 0;
 
     final long[] history = new long[historyLength];
     Arrays.fill(history, currentArea);
@@ -142,6 +151,23 @@ public final class LatePoems
           best.copyFrom(current);
           bestArea = area;
         }
+
+        if (area < runBestArea)
+        {
+          runBestArea = area;
+          runImproved = LatePoems.evaluations;
+        }
+      }
+
+      if ((stall > 0) && (LatePoems.evaluations - runImproved > stall))
+      {
+        LatePoems.LOG.log("Restarting after %d evaluations...", Long.valueOf(LatePoems.evaluations));
+
+        current.copyFrom(start);
+        currentArea = startArea;
+        runBestArea = startArea;
+        runImproved = LatePoems.evaluations;
+        Arrays.fill(history, startArea);
       }
 
       history[slot] = currentArea;

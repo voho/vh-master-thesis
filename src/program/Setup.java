@@ -76,6 +76,11 @@ public class Setup
    * modules)
    */
   public static final double ANNEALING_END = Double.parseDouble(System.getProperty("poems.t1", "0.000001"));
+  /**
+   * the late acceptance POEMS restarts from the prototype if its best solution
+   * does not improve for this number of evaluations per module (0 = never)
+   */
+  public static final int RESTART = Integer.getInteger("poems.restart", 0).intValue();
   
   // MUTABLE PARAMETERS
   // ==================
