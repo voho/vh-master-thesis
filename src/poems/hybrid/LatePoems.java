@@ -97,6 +97,8 @@ public final class LatePoems
     final int last = current.size() - 1;
     final boolean annealing = (Setup.ANNEALING_START > 0);
     final double used = Placer.measureNumbered(prototype).getUsedArea();
+
+    Logger.trace((long) (bestArea - used));
     double temperature = Setup.ANNEALING_START * used;
     int slot = 0;
 
@@ -159,6 +161,7 @@ public final class LatePoems
         {
           best.copyFrom(current);
           bestArea = area;
+          Logger.trace((long) (area - used));
         }
 
         if (area < runBestArea)

@@ -63,6 +63,8 @@ final public class Logger
   private static File fileBenchmark = null;
   private static File dirOutput = null;
   private static StringBuilder logBuffer = new StringBuilder();
+  private static StringBuilder traceBuffer = null;
+  private static long traceStart = 0;
   
   private static Logger LOG = Logger.create(Logger.class);
   
@@ -246,6 +248,41 @@ final public class Logger
       x.printStackTrace();
       System.exit(-1);
     }
+  }
+  
+  /**
+   * Starts recording the convergence trace (time and unused area of each
+   * improvement of the best solution).
+   */
+  public static void startTrace()
+  {
+    Logger.traceBuffer = new StringBuilder();
+    Logger.traceStart = System.currentTimeMillis();
+  }
+  
+  /**
+   * Records an improvement of the best solution (if the trace is recorded).
+   * 
+   * @param unusedArea unused area of the new best solution
+   */
+  public static void trace(final long unusedArea)
+  {
+    if (Logger.traceBuffer != null)
+    {
+      Logger.traceBuffer.append(System.currentTimeMillis() - Logger.traceStart).append(',').append(unusedArea).append('\n');
+    }
+  }
+  
+  /**
+   * Returns the recorded convergence trace (CSV: milliseconds, unused area).
+   * 
+   * @return the trace
+   */
+  public static String getTrace()
+  {
+    return (Logger.traceBuffer == null)
+        ? ""
+        : Logger.traceBuffer.toString();
   }
   
   public static void iterated(final Individual temp)

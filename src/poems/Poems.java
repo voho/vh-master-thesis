@@ -75,6 +75,8 @@ final public class Poems
     Individual best = Individual.prototype(prototype, n);
     Individual current = best;
     
+    Logger.trace(-best.getFitness());
+    
     // fitness history for the late acceptance (if enabled)
     
     final int[] history = new int[Math.max(1, Setup.LATE_ACCEPTANCE)];
@@ -112,6 +114,7 @@ final public class Poems
       if (temp.isBetter(best))
       {
         Logger.improvement(temp, ii);
+        Logger.trace(-temp.getFitness());
       }
       
       // replace old prototype if new better or equal (or if not worse than

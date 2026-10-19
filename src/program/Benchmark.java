@@ -1,7 +1,8 @@
 package program;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +41,9 @@ public class Benchmark
    * Benchmark entry point.
    *
    * @param args command line arguments
-   * @throws FileNotFoundException file not found
+   * @throws IOException file not found or not writable
    */
-  public static void main(final String[] args) throws FileNotFoundException
+  public static void main(final String[] args) throws IOException
   {
     if (args.length != 7)
     {
@@ -65,6 +66,13 @@ public class Benchmark
     Utility.setSeed(Setup.SEED);
 
     final Set<Module> modules = Importer.loadProblem(file);
+
+    final String trace = System.getProperty("poems.trace");
+
+    if (trace != null)
+    {
+      Logger.startTrace();
+    }
 
     final long start = System.currentTimeMillis();
     final BTree<PlacedModule> placed;
@@ -89,6 +97,13 @@ public class Benchmark
     }
 
     final long duration = System.currentTimeMillis() - start;
+
+    if (trace != null)
+    {
+      final FileWriter writer = new FileWriter(trace);
+      writer.write(Logger.getTrace());
+      writer.close();
+    }
 
     final Evaluation evaluation = Evaluator.evaluate(placed);
     final String valid = Benchmark.validate(modules, placed);
