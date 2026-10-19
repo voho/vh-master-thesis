@@ -2,6 +2,7 @@ package btree.utility;
 
 import module.PlacedModule;
 import btree.BTree;
+import btree.NumberedValue;
 
 /**
  * Floorplan evaluator.
@@ -33,7 +34,7 @@ final public class Evaluator
       throw new NullPointerException("Cannot compare tree with a NULL value.");
     }
     
-    if (!a.getValue().equals(b.getValue()))
+    if (!Evaluator.equalValues(a.getValue(), b.getValue()))
     {
       // values differ
       return false;
@@ -61,6 +62,30 @@ final public class Evaluator
     {
       // right subtree differs
       return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Checks if two B*-Tree values equal each other. Numbered values are equal
+   * only if they contain equal values, so a rotated module is not considered
+   * to be the same as the original one.
+   * 
+   * @param a first value
+   * @param b second value
+   * @return TRUE if both values equal, FALSE otherwise
+   */
+  private static boolean equalValues(final Object a, final Object b)
+  {
+    if (!a.equals(b))
+    {
+      return false;
+    }
+    
+    if ((a instanceof NumberedValue<?>) && (b instanceof NumberedValue<?>))
+    {
+      return ((NumberedValue<?>) a).getValue().equals(((NumberedValue<?>) b).getValue());
     }
     
     return true;

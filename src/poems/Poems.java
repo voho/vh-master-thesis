@@ -69,7 +69,9 @@ final public class Poems
     
     Logger.prototype(prototype);
     
-    Individual best = null;
+    // the prototype is the best solution so far
+    
+    Individual best = Individual.prototype(prototype, n);
     
     final long deadline = (Setup.TIME_LIMIT > 0)
         ? System.currentTimeMillis() + Setup.TIME_LIMIT
@@ -77,7 +79,7 @@ final public class Poems
     
     Poems.iterations = 0;
     
-    for (int ii = 0; (ii < i) && ((best == null) || (System.currentTimeMillis() < deadline)); ii++)
+    for (int ii = 0; (ii < i) && (System.currentTimeMillis() < deadline); ii++)
     {
       Poems.iterations++;
       
@@ -86,11 +88,9 @@ final public class Poems
       // create a new population
       
       final Population population = new Population(
-          best == null
-              ? prototype
-              : best.getBuildPlan(),
-              n,
-              s);
+          best.getBuildPlan(),
+          n,
+          s);
       
       // optimise the prototype
       
@@ -102,14 +102,14 @@ final public class Poems
       
       Logger.iterated(temp);
       
-      if ((best == null) || temp.isBetter(best))
+      if (temp.isBetter(best))
       {
         Logger.improvement(temp, ii);
       }
       
       // replace old prototype if new better of equal
       
-      if ((best == null) || temp.isBetterOrEqual(best))
+      if (temp.isBetterOrEqual(best))
       {
         Poems.LOG.log("Better prototype found: %s", temp);
         

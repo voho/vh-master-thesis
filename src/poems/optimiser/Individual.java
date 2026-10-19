@@ -60,6 +60,21 @@ public class Individual
   }
   
   /**
+   * Creates an individual representing the unmodified prototype (all its
+   * actions are disabled).
+   * 
+   * @param prototype prototype
+   * @param length action sequence length
+   * @return the prototype individual
+   */
+  public static Individual prototype(final BTree<NumberedValue<Module>> prototype, final int length)
+  {
+    final PoemsActionSequence nop = PoemsActionSequence.random(prototype.getValue().getLastNumber(), length, 0);
+    
+    return new Individual(nop, prototype, Placer.measureNumbered(prototype).getFitness());
+  }
+  
+  /**
    * Creates a new individual by a crossover operator.
    * 
    * @param prototype prototype
@@ -141,6 +156,21 @@ public class Individual
   public static long getEvaluations()
   {
     return Individual.evaluations;
+  }
+  
+  /**
+   * Creates a new instance with a known fitness.
+   * 
+   * @param sequence action sequence
+   * @param buildPlan B*-Tree of unplaced modules
+   * @param fitness fitness value
+   */
+  private Individual(final PoemsActionSequence sequence, final BTree<NumberedValue<Module>> buildPlan, final int fitness)
+  {
+    this.sequence = sequence;
+    this.buildPlan = buildPlan;
+    this.buildResult = null;
+    this.fitness = fitness;
   }
   
   /**

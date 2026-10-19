@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -72,7 +75,7 @@ final public class Prototyper
     // initialize collections
     
     final Set<Module> unplacedSet = Prototyper.flipToWide(modules);
-    final Queue<Module> unplacedQueue = Prototyper.createUnplacedQueue(unplacedSet);
+    final List<Module> unplacedQueue = Prototyper.createUnplacedList(unplacedSet);
     
     // initialize variables
     
@@ -157,25 +160,43 @@ final public class Prototyper
   }
   
   /**
-   * Picks the first module from a queue that fits into the spece provided. If
-   * no such module exists, NULL is returned.
+   * Picks the first module from a sorted list that fits into the space
+   * provided. If no such module exists, NULL is returned.
    * 
-   * @param queue queue of modules
+   * @param queue sorted list of modules
    * @param space space width
    * @return the best module from a queue that fits into the given space
    */
-  private static Module pollBestFit(final Queue<Module> queue, final int space)
+  private static Module pollBestFit(final List<Module> queue, final int space)
   {
-    for (final Module module : queue)
+    final Iterator<Module> iterator = queue.iterator();
+    
+    while (iterator.hasNext())
     {
+      final Module module = iterator.next();
+      
       if (module.getWidth() <= space)
       {
-        queue.remove(module);
+        iterator.remove();
         return module;
       }
     }
     
     return null;
+  }
+  
+  /**
+   * Creates a list of modules sorted by the common module comparator. Note
+   * that iterating over a priority queue does not respect its order.
+   * 
+   * @param modules input modules
+   * @return sorted list of modules
+   */
+  private static List<Module> createUnplacedList(final Set<Module> modules)
+  {
+    final List<Module> list = new LinkedList<Module>(modules);
+    Collections.sort(list, Prototyper.createModuleComparator());
+    return list;
   }
   
   /**

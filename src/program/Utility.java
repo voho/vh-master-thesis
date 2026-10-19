@@ -85,7 +85,7 @@ public class Utility
   
   /**
    * Increments a given value. If the incremented value grows over the maximum,
-   * it is first read modulo maximum and then returned.
+   * it wraps around to zero (the result is in the range [0, maximum]).
    * 
    * @param value value to increment
    * @param increment increment to be added to the value
@@ -114,7 +114,7 @@ public class Utility
       return 0;
     }
     
-    return (value + increment) % max;
+    return (value + increment) % (max + 1);
   }
   
   /**
