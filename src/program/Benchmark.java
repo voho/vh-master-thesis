@@ -71,7 +71,7 @@ public class Benchmark
     final long evaluations;
     final int iterations;
 
-    if ("lahc".equals(System.getProperty("poems.algorithm")))
+    if (Setup.isLatePoems())
     {
       // late acceptance POEMS: N = maximal number of actions in one step,
       // S = late acceptance history length

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import module.Module;
+import poems.optimiser.Individual;
 import program.Logger;
 import program.Setup;
 import program.Utility;
@@ -62,7 +63,11 @@ public final class LatePoems
   {
     LatePoems.LOG.log("Solving instance using late acceptance POEMS (length %d, history %d)...", length, historyLength);
 
-    final BTree<NumberedValue<Module>> prototype = Numberator.number(Prototyper.createBestFit(modules));
+    final BTree<NumberedValue<Module>> prototype = Numberator.number(Setup.BEST_FIT_PROTOTYPE
+        ? Prototyper.createBestFit(modules)
+        : Prototyper.createCompleteTree(modules));
+
+    Logger.prototype(prototype);
 
     final ArrayBTree start = new ArrayBTree(prototype);
     ArrayBTree current = new ArrayBTree(start);
@@ -181,6 +186,22 @@ public final class LatePoems
     LatePoems.LOG.log("Best area: %d", Long.valueOf(bestArea));
 
     return best.toBTree();
+  }
+
+  /**
+   * Solves a problem instance and returns the result as an individual (with
+   * no actions, the result is its prototype).
+   *
+   * @param modules set of modules to place
+   * @param timeLimit time limit in milliseconds
+   * @param maxEvaluations maximal number of evaluations (0 = no limit)
+   * @param length maximal number of actions applied in one step
+   * @param historyLength length of the late acceptance history
+   * @return the best floorplan found
+   */
+  public static Individual solveIndividual(final Set<Module> modules, final long timeLimit, final long maxEvaluations, final int length, final int historyLength)
+  {
+    return Individual.prototype(LatePoems.solve(modules, timeLimit, maxEvaluations, length, historyLength), length);
   }
 
   /**

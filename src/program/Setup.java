@@ -114,6 +114,15 @@ public class Setup
    */
   public static int NICHE_SIZE = 20;
   /**
+   * algorithm: "poems" (POEMS with the genetic algorithm) or "lapoems" (late
+   * acceptance POEMS)
+   */
+  public static String ALGORITHM = System.getProperty("poems.algorithm", "poems");
+  /**
+   * late acceptance history length (late acceptance POEMS)
+   */
+  public static int HISTORY = Integer.getInteger("poems.history", 1000).intValue();
+  /**
    * seed of the random number generator
    */
   public static long SEED = 0;
@@ -142,6 +151,16 @@ public class Setup
     // NOP
   }
   
+  /**
+   * Checks if the late acceptance POEMS is selected.
+   *
+   * @return TRUE if the late acceptance POEMS is selected
+   */
+  public static boolean isLatePoems()
+  {
+    return "lapoems".equals(Setup.ALGORITHM) || "lahc".equals(Setup.ALGORITHM);
+  }
+
   /**
    * Reads comma separated weights from a system property and normalizes them
    * to sum to one.

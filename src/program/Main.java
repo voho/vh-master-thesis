@@ -6,6 +6,7 @@ import java.util.Set;
 
 import module.Module;
 import poems.Poems;
+import poems.hybrid.LatePoems;
 import poems.optimiser.Individual;
 
 /**
@@ -30,9 +31,14 @@ public class Main
   {
     Main.LOG.log("Starting the program...");
     
-    if (args.length != 9)
+    if ((args.length < 9) || !Main.parseOptions(args))
     {
-      System.out.println("Usage: {INPUT (dir)} {OUTPUT (dir)} {VERBOSE (true/false)} {#R} {#I} {#G} {#N} {#S} {BESTFIT (true/false)}");
+      System.out.println("Usage: {INPUT (dir)} {OUTPUT (dir)} {VERBOSE (true/false)} {#R} {#I} {#G} {#N} {#S} {BESTFIT (true/false)} [OPTIONS]");
+      System.out.println("Options:");
+      System.out.println("  --algorithm=poems|lapoems  solver: POEMS with the genetic algorithm (default) or late acceptance POEMS");
+      System.out.println("  --time=SECONDS             time limit of each run (late acceptance POEMS: I * G steps if not set)");
+      System.out.println("  --seed=NUMBER              seed of the random number generator");
+      System.out.println("  --history=LENGTH           late acceptance history length (late acceptance POEMS only)");
       return;
     }
     
@@ -57,6 +63,8 @@ public class Main
     Main.LOG.log("Niche count: %d", Setup.NICHE_COUNT);
     Main.LOG.log("Niche size: %d", Setup.NICHE_SIZE);
     Main.LOG.log("Best-fit prototype: %s", Setup.BEST_FIT_PROTOTYPE);
+    Main.LOG.log("Algorithm: %s", Setup.ALGORITHM);
+    Main.LOG.log("Time limit: %d [ms]", Setup.TIME_LIMIT);
     
     if (!Setup.DIR_INPUT.exists())
     {
@@ -101,12 +109,21 @@ public class Main
         
         Logger.newRun(i);
         
-        final Individual result = Poems.solve(
-            modules,
-            Setup.ITERATIONS,
-            Setup.GENERATIONS,
-            Setup.NICHE_COUNT,
-            Setup.NICHE_SIZE);
+        final Individual result = Setup.isLatePoems()
+            ? LatePoems.solveIndividual(
+                modules,
+                Setup.TIME_LIMIT,
+                (Setup.TIME_LIMIT > 0)
+                    ? 0
+                    : (long) Setup.ITERATIONS * (long) Setup.GENERATIONS,
+                Setup.NICHE_COUNT,
+                Setup.HISTORY)
+            : Poems.solve(
+                modules,
+                Setup.ITERATIONS,
+                Setup.GENERATIONS,
+                Setup.NICHE_COUNT,
+                Setup.NICHE_SIZE);
         
         Logger.endRun(result);
       }
@@ -115,5 +132,48 @@ public class Main
     }
     
     Main.LOG.log("Program finished, good bye.");
+  }
+  
+  /**
+   * Parses the optional arguments (following the nine mandatory ones).
+   * 
+   * @param args command line arguments
+   * @return TRUE if all optional arguments are valid
+   */
+  private static boolean parseOptions(final String[] args)
+  {
+    for (int i = 9; i < args.length; i++)
+    {
+      final String[] option = args[i].split("=", 2);
+      
+      if (option.length != 2)
+      {
+        return false;
+      }
+      
+      if ("--algorithm".equals(option[0]))
+      {
+        Setup.ALGORITHM = option[1];
+      }
+      else if ("--time".equals(option[0]))
+      {
+        Setup.TIME_LIMIT = 1000L * Long.parseLong(option[1]);
+      }
+      else if ("--seed".equals(option[0]))
+      {
+        Setup.SEED = Long.parseLong(option[1]);
+        Utility.setSeed(Setup.SEED);
+      }
+      else if ("--history".equals(option[0]))
+      {
+        Setup.HISTORY = Integer.parseInt(option[1]);
+      }
+      else
+      {
+        return false;
+      }
+    }
+    
+    return "poems".equals(Setup.ALGORITHM) || Setup.isLatePoems();
   }
 }
