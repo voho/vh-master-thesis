@@ -52,7 +52,7 @@ public class Setup
    * evaluate the action sequences using the array B*-Tree (the results are
    * the same, but the evaluation is much faster)
    */
-  public static final boolean FAST_EVALUATION = Setup.flag("poems.fast", false);
+  public static final boolean FAST_EVALUATION = Setup.flag("poems.fast", true);
   /**
    * length of the late acceptance history; a worse prototype is accepted if it
    * is not worse than the prototype this number of iterations ago (0 = only
@@ -67,15 +67,15 @@ public class Setup
   public static final double[] ACTION_WEIGHTS = Setup.weights("poems.weights");
   /**
    * initial temperature of the simulated annealing used by the late
-   * acceptance POEMS instead of the late acceptance (relative to the area of
-   * all modules, 0 = late acceptance is used)
+   * acceptance POEMS (relative to the area of all modules, 0 = late
+   * acceptance is used instead)
    */
-  public static final double ANNEALING_START = Double.parseDouble(System.getProperty("poems.t0", "0"));
+  public static double ANNEALING_START = Double.parseDouble(System.getProperty("poems.t0", "0.01"));
   /**
    * final temperature of the simulated annealing (relative to the area of all
    * modules)
    */
-  public static final double ANNEALING_END = Double.parseDouble(System.getProperty("poems.t1", "0.000001"));
+  public static final double ANNEALING_END = Double.parseDouble(System.getProperty("poems.t1", "0.00001"));
   /**
    * the late acceptance POEMS restarts from the prototype if its best solution
    * does not improve for this number of evaluations per module (0 = never)
@@ -85,7 +85,7 @@ public class Setup
    * probability that the late acceptance POEMS chooses the second module of
    * an action close to the first one in the tree (0 = always at random)
    */
-  public static final double LOCAL_PARTNER = Double.parseDouble(System.getProperty("poems.local", "0"));
+  public static final double LOCAL_PARTNER = Double.parseDouble(System.getProperty("poems.local", "0.5"));
   /**
    * the automatic late acceptance history length is the expected number of
    * evaluations divided by this ratio

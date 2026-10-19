@@ -38,7 +38,8 @@ public class Main
       System.out.println("  --algorithm=poems|lapoems  solver: POEMS with the genetic algorithm (default) or late acceptance POEMS");
       System.out.println("  --time=SECONDS             time limit of each run (late acceptance POEMS: I * G steps if not set)");
       System.out.println("  --seed=NUMBER              seed of the random number generator");
-      System.out.println("  --history=LENGTH           late acceptance history length (late acceptance POEMS only)");
+      System.out.println("  --history=LENGTH           late acceptance POEMS: late acceptance with this history length");
+      System.out.println("                             (0 = automatic) instead of simulated annealing");
       return;
     }
     
@@ -167,6 +168,7 @@ public class Main
       else if ("--history".equals(option[0]))
       {
         Setup.HISTORY = Integer.parseInt(option[1]);
+        Setup.ANNEALING_START = 0;
       }
       else
       {
