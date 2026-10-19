@@ -208,8 +208,10 @@ final public class Logger
   
   public static void prototype(final BTree<NumberedValue<Module>> prototype)
   {
-    if (!Setup.EXPORT)
+    if (!Setup.EXPORT || (Logger.dirOutput == null))
     {
+      // exports disabled or no run started
+      
       return;
     }
     
@@ -228,8 +230,10 @@ final public class Logger
   
   public static void improvement(final Individual best, final int i)
   {
-    if (!Setup.EXPORT)
+    if (!Setup.EXPORT || (Logger.dirOutput == null))
     {
+      // exports disabled or no run started
+      
       return;
     }
     
