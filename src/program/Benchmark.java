@@ -110,6 +110,32 @@ public class Benchmark
       writer.close();
     }
 
+    final String placement = System.getProperty("poems.placement");
+
+    if (placement != null)
+    {
+      // the floorplan as CSV: module, x, y, width, height
+
+      final StringBuilder buffer = new StringBuilder();
+
+      for (final BTree<PlacedModule> node : placed)
+      {
+        final PlacedModule p = node.getValue();
+
+        buffer.append(String.format(
+            "%s,%d,%d,%d,%d%n",
+            p.getModule().getName(),
+            p.getPosition().getX(),
+            p.getPosition().getY(),
+            p.getModule().getWidth(),
+            p.getModule().getHeight()));
+      }
+
+      final FileWriter writer = new FileWriter(new File(placement, String.format("%s_%d.csv", file.getName().replace(".txt", ""), Setup.SEED)));
+      writer.write(buffer.toString());
+      writer.close();
+    }
+
     final Evaluation evaluation = Evaluator.evaluate(placed);
     final String valid = Benchmark.validate(modules, placed);
 
