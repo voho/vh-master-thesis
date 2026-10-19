@@ -100,7 +100,12 @@ public class Benchmark
 
     if (trace != null)
     {
-      final FileWriter writer = new FileWriter(trace);
+      // a directory: one trace file for each benchmark and seed
+
+      final File traceFile = new File(trace).isDirectory()
+          ? new File(trace, String.format("%s_%d.csv", file.getName().replace(".txt", ""), Setup.SEED))
+          : new File(trace);
+      final FileWriter writer = new FileWriter(traceFile);
       writer.write(Logger.getTrace());
       writer.close();
     }
