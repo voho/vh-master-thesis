@@ -44,6 +44,14 @@ public final class LatePoems
    * random numbers for the walk to a close module (at most 3 steps)
    */
   private static final double[] WALK = new double[3];
+  /**
+   * minimal automatic history length
+   */
+  private static final int MIN_HISTORY = 100;
+  /**
+   * maximal automatic history length
+   */
+  private static final int MAX_HISTORY = 10000000;
 
   /**
    * Creation is not allowed.
@@ -60,7 +68,8 @@ public final class LatePoems
    * @param timeLimit time limit in milliseconds
    * @param maxEvaluations maximal number of evaluations (0 = no limit)
    * @param length maximal number of actions applied in one step
-   * @param historyLength length of the late acceptance history
+   * @param historyLength length of the late acceptance history (0 = chosen
+   * automatically from the expected number of evaluations)
    * @return the best floorplan found
    */
   public static BTree<NumberedValue<Module>> solve(final Set<Module> modules, final long timeLimit, final long maxEvaluations, final int length, final int historyLength)
@@ -89,7 +98,18 @@ public final class LatePoems
     long runBestArea = currentArea;
     long runImproved = 0;
 
-    final long[] history = new long[historyLength];
+    // with the automatic history length, a short history is used until the
+    // speed of the evaluation is measured (or the length is computed from the
+    // maximal number of evaluations directly)
+
+    final boolean automatic = (historyLength <= 0);
+    boolean measured = !automatic || (maxEvaluations > 0);
+    int size = automatic
+        ? ((maxEvaluations > 0)
+            ? LatePoems.getHistoryLength(maxEvaluations)
+            : LatePoems.MIN_HISTORY)
+        : historyLength;
+    long[] history = new long[size];
     Arrays.fill(history, currentArea);
 
     final long begin = System.currentTimeMillis();
@@ -113,6 +133,21 @@ public final class LatePoems
         if (now >= deadline)
         {
           break;
+        }
+
+        if (!measured && ((now - begin) * 50 >= timeLimit))
+        {
+          // the expected number of evaluations is known after 2% of the time
+
+          final double rate = (double) LatePoems.evaluations / Math.max(1, now - begin);
+
+          size = LatePoems.getHistoryLength((long) (rate * timeLimit));
+          history = new long[size];
+          Arrays.fill(history, currentArea);
+          slot = 0;
+          measured = true;
+
+          LatePoems.LOG.log("History length set to %d.", Integer.valueOf(size));
         }
 
         if (annealing)
@@ -184,7 +219,7 @@ public final class LatePoems
 
       history[slot] = currentArea;
 
-      if (++slot == historyLength)
+      if (++slot == size)
       {
         slot = 0;
       }
@@ -193,6 +228,17 @@ public final class LatePoems
     LatePoems.LOG.log("Best area: %d", Long.valueOf(bestArea));
 
     return best.toBTree();
+  }
+
+  /**
+   * Returns the automatic late acceptance history length.
+   *
+   * @param evaluations expected number of evaluations
+   * @return the history length
+   */
+  private static int getHistoryLength(final long evaluations)
+  {
+    return (int) Math.max(LatePoems.MIN_HISTORY, Math.min(LatePoems.MAX_HISTORY, evaluations / Setup.HISTORY_RATIO));
   }
 
   /**

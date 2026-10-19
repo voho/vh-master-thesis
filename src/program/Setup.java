@@ -86,6 +86,11 @@ public class Setup
    * an action close to the first one in the tree (0 = always at random)
    */
   public static final double LOCAL_PARTNER = Double.parseDouble(System.getProperty("poems.local", "0"));
+  /**
+   * the automatic late acceptance history length is the expected number of
+   * evaluations divided by this ratio
+   */
+  public static final long HISTORY_RATIO = Long.getLong("poems.ratio", 20000).longValue();
   
   // MUTABLE PARAMETERS
   // ==================
