@@ -29,6 +29,31 @@ public class Setup
    * select from one niche
    */
   public static final boolean NICHE_SELECTION = true;
+  /**
+   * do not evaluate and insert individuals whose action sequence (enabled
+   * actions only) is already present in the population
+   */
+  public static final boolean DEDUPLICATE = Setup.flag("poems.dedupe", false);
+  /**
+   * end the evolution after this number of generations without improvement
+   * of the best individual (0 = never)
+   */
+  public static final int PATIENCE = Integer.getInteger("poems.patience", 0).intValue();
+  /**
+   * end the evolution as soon as an individual better than the prototype is
+   * found
+   */
+  public static final boolean FIRST_IMPROVEMENT = Setup.flag("poems.first", false);
+  /**
+   * use the move node action (moves a single node, not the whole subtree)
+   */
+  public static final boolean MOVE_ACTION = Setup.flag("poems.move", false);
+  /**
+   * length of the late acceptance history; a worse prototype is accepted if it
+   * is not worse than the prototype this number of iterations ago (0 = only
+   * better or equal prototypes are accepted)
+   */
+  public static final int LATE_ACCEPTANCE = Integer.getInteger("poems.lahc", 0).intValue();
   
   // MUTABLE PARAMETERS
   // ==================
@@ -88,5 +113,21 @@ public class Setup
   private Setup()
   {
     // NOP
+  }
+  
+  /**
+   * Reads a Boolean system property.
+   * 
+   * @param name property name
+   * @param defaultValue value used if the property is not set
+   * @return property value
+   */
+  private static boolean flag(final String name, final boolean defaultValue)
+  {
+    final String value = System.getProperty(name);
+    
+    return (value == null)
+        ? defaultValue
+        : Boolean.parseBoolean(value);
   }
 }

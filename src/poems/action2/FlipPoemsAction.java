@@ -57,6 +57,14 @@ public class FlipPoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(1, this.number), this.recursive
+        ? 1
+        : 0);
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("flip(%d,%s)", this.number, this.recursive);

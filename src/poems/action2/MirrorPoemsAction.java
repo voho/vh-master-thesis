@@ -100,6 +100,14 @@ public class MirrorPoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(5, this.number), this.recursive
+        ? 1
+        : 0);
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("mirror(%d,%s)", this.number, this.recursive);

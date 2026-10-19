@@ -7,7 +7,9 @@ import poems.action2.ExchangeValuePoemsAction;
 import poems.action2.FlipPoemsAction;
 import poems.action2.MirrorPoemsAction;
 import poems.action3.HangNodePoemsAction;
+import poems.action3.MoveNodePoemsAction;
 import program.Logger;
+import program.Setup;
 import program.Utility;
 import btree.BTree;
 import btree.NumberedValue;
@@ -60,6 +62,41 @@ abstract public class AbstractPoemsAction
   public boolean isEnabled()
   {
     return this.enabled;
+  }
+  
+  /**
+   * Returns the signature of the action. Two actions with the same signature
+   * modify the tree in the same way (with a negligible probability of a hash
+   * collision). All disabled actions have the signature 0.
+   * 
+   * @return the action signature
+   */
+  public long getSignature()
+  {
+    return this.enabled
+        ? this.getActiveSignature()
+        : 0;
+  }
+  
+  /**
+   * Returns the signature of the action when active.
+   * 
+   * @return the signature
+   */
+  abstract protected long getActiveSignature();
+  
+  /**
+   * Combines the hash with the next value.
+   * 
+   * @param hash hash
+   * @param value next value
+   * @return combined hash
+   */
+  protected static long hash(final long hash, final long value)
+  {
+    long h = (hash ^ value) * 0x9E3779B97F4A7C15L;
+    h ^= (h >>> 29);
+    return h;
   }
   
   /**
@@ -123,7 +160,9 @@ abstract public class AbstractPoemsAction
   {
     final AbstractPoemsAction action;
     
-    switch (Utility.random(0, 5))
+    switch (Utility.random(0, Setup.MOVE_ACTION
+        ? 6
+        : 5))
     {
     case 0:
       action = FlipPoemsAction.random(enabled, lastNumber);
@@ -142,6 +181,9 @@ abstract public class AbstractPoemsAction
       break;
     case 5:
       action = HangNodePoemsAction.random(enabled, lastNumber);
+      break;
+    case 6:
+      action = MoveNodePoemsAction.random(enabled, lastNumber);
       break;
     default:
       throw new IndexOutOfBoundsException();

@@ -60,6 +60,18 @@ public class Individual
   }
   
   /**
+   * Creates an individual by applying the sequence to the prototype.
+   * 
+   * @param prototype prototype
+   * @param sequence action sequence
+   * @return a new individual
+   */
+  public static Individual create(final BTree<NumberedValue<Module>> prototype, final PoemsActionSequence sequence)
+  {
+    return new Individual(prototype, sequence);
+  }
+  
+  /**
    * Creates an individual representing the unmodified prototype (all its
    * actions are disabled).
    * 

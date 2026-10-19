@@ -1,5 +1,6 @@
 package poems;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import module.Module;
@@ -72,6 +73,12 @@ final public class Poems
     // the prototype is the best solution so far
     
     Individual best = Individual.prototype(prototype, n);
+    Individual current = best;
+    
+    // fitness history for the late acceptance (if enabled)
+    
+    final int[] history = new int[Math.max(1, Setup.LATE_ACCEPTANCE)];
+    Arrays.fill(history, current.getFitness());
     
     final long deadline = (Setup.TIME_LIMIT > 0)
         ? System.currentTimeMillis() + Setup.TIME_LIMIT
@@ -88,13 +95,13 @@ final public class Poems
       // create a new population
       
       final Population population = new Population(
-          best.getBuildPlan(),
+          current.getBuildPlan(),
           n,
           s);
       
       // optimise the prototype
       
-      final Individual temp = population.evolve(g, deadline);
+      final Individual temp = population.evolve(g, deadline, current.getFitness());
       
       Poems.LOG.log("Iteration %d brought: %s", ii, temp);
       
@@ -107,13 +114,23 @@ final public class Poems
         Logger.improvement(temp, ii);
       }
       
-      // replace old prototype if new better of equal
+      // replace old prototype if new better or equal (or if not worse than
+      // the prototype several iterations ago, if late acceptance is enabled)
       
-      if (temp.isBetterOrEqual(best))
+      final int slot = ii % history.length;
+      
+      if (temp.isBetterOrEqual(current) || ((Setup.LATE_ACCEPTANCE > 0) && (temp.getFitness() >= history[slot])))
       {
-        Poems.LOG.log("Better prototype found: %s", temp);
+        Poems.LOG.log("New prototype accepted: %s", temp);
         
-        best = temp;
+        current = temp;
+      }
+      
+      history[slot] = current.getFitness();
+      
+      if (current.isBetterOrEqual(best))
+      {
+        best = current;
       }
     }
     

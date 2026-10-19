@@ -67,6 +67,12 @@ public class ExchangeValuePoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(4, Math.min(this.node1, this.node2)), Math.max(this.node1, this.node2));
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("xchangeval(%d,%d)", this.node1, this.node2);

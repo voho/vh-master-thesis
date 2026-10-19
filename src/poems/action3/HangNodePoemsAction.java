@@ -70,6 +70,14 @@ public class HangNodePoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(AbstractPoemsAction.hash(AbstractPoemsAction.hash(6, this.left
+        ? 1
+        : 0), this.node1), this.node2);
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("hang(%s,%d,%d)", this.left ? "L" : "R", this.node1, this.node2);

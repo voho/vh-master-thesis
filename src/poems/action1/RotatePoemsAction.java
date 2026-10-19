@@ -49,6 +49,12 @@ public class RotatePoemsAction extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    return AbstractPoemsAction.hash(2, this.number);
+  }
+  
+  @Override
   public String toActiveString()
   {
     return String.format("rotate(%d)", this.number);

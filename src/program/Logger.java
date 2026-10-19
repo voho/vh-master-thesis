@@ -14,6 +14,7 @@ import poems.action2.ExchangeValuePoemsAction;
 import poems.action2.FlipPoemsAction;
 import poems.action2.MirrorPoemsAction;
 import poems.action3.HangNodePoemsAction;
+import poems.action3.MoveNodePoemsAction;
 import poems.optimiser.Individual;
 import btree.BTree;
 import btree.NumberedValue;
@@ -34,6 +35,7 @@ final public class Logger
   private static long countMirror = 0;
   private static long countRotate = 0;
   private static long countExchangeNode = 0;
+  private static long countMoveNode = 0;
   
   private static long countLastNop = 0;
   private static long countLastHangNode = 0;
@@ -42,6 +44,7 @@ final public class Logger
   private static long countLastMirror = 0;
   private static long countLastRotate = 0;
   private static long countLastExchangeNode = 0;
+  private static long countLastMoveNode = 0;
   
   private static long countBestNop = 0;
   private static long countBestHangNode = 0;
@@ -50,6 +53,7 @@ final public class Logger
   private static long countBestMirror = 0;
   private static long countBestRotate = 0;
   private static long countBestExchangeNode = 0;
+  private static long countBestMoveNode = 0;
   
   private static List<Double> fitAverage = new LinkedList<Double>();
   private static List<Double> fitBest = new LinkedList<Double>();
@@ -103,6 +107,7 @@ final public class Logger
     Logger.countMirror = 0;
     Logger.countRotate = 0;
     Logger.countExchangeNode = 0;
+    Logger.countMoveNode = 0;
     
     Logger.countLastNop = 0;
     Logger.countLastHangNode = 0;
@@ -111,6 +116,7 @@ final public class Logger
     Logger.countLastMirror = 0;
     Logger.countLastRotate = 0;
     Logger.countLastExchangeNode = 0;
+    Logger.countLastMoveNode = 0;
     
     Logger.countBestNop = 0;
     Logger.countBestHangNode = 0;
@@ -119,6 +125,7 @@ final public class Logger
     Logger.countBestMirror = 0;
     Logger.countBestRotate = 0;
     Logger.countBestExchangeNode = 0;
+    Logger.countBestMoveNode = 0;
     
     Logger.fitAverage.clear();
     Logger.fitBest.clear();
@@ -155,6 +162,7 @@ final public class Logger
     Logger.LOG.info("Total exchange value: " + Logger.countExchangeValue);
     Logger.LOG.info("Total exchange node: " + Logger.countExchangeNode);
     Logger.LOG.info("Total hang node: " + Logger.countHangNode);
+    Logger.LOG.info("Total move node: " + Logger.countMoveNode);
     
     Logger.LOG.info("Total LAST nop: " + Logger.countLastNop);
     Logger.LOG.info("Total LAST flip: " + Logger.countLastFlip);
@@ -163,6 +171,7 @@ final public class Logger
     Logger.LOG.info("Total LAST exchange value: " + Logger.countLastExchangeValue);
     Logger.LOG.info("Total LAST exchange node: " + Logger.countLastExchangeNode);
     Logger.LOG.info("Total LAST hang node: " + Logger.countLastHangNode);
+    Logger.LOG.info("Total LAST move node: " + Logger.countLastMoveNode);
     
     Logger.LOG.info("Total BEST nop: " + Logger.countBestNop);
     Logger.LOG.info("Total BEST flip: " + Logger.countBestFlip);
@@ -171,6 +180,7 @@ final public class Logger
     Logger.LOG.info("Total BEST exchange value: " + Logger.countBestExchangeValue);
     Logger.LOG.info("Total BEST exchange node: " + Logger.countBestExchangeNode);
     Logger.LOG.info("Total BEST hang node: " + Logger.countBestHangNode);
+    Logger.LOG.info("Total BEST move node: " + Logger.countBestMoveNode);
     
     Logger.LOG.info("Result: " + result);
     Logger.LOG.info("Duration: %d [ms]", duration);
@@ -286,6 +296,10 @@ final public class Logger
           {
             Logger.countLastRotate++;
           }
+          else if (action.getClass().equals(MoveNodePoemsAction.class))
+          {
+            Logger.countLastMoveNode++;
+          }
           else
           {
             throw new IllegalStateException();
@@ -328,6 +342,10 @@ final public class Logger
         {
           Logger.countBestRotate++;
         }
+        else if (action.getClass().equals(MoveNodePoemsAction.class))
+        {
+          Logger.countBestMoveNode++;
+        }
         else
         {
           throw new IllegalStateException();
@@ -369,6 +387,10 @@ final public class Logger
       else if (action.getClass().equals(RotatePoemsAction.class))
       {
         Logger.countRotate++;
+      }
+      else if (action.getClass().equals(MoveNodePoemsAction.class))
+      {
+        Logger.countMoveNode++;
       }
       else
       {

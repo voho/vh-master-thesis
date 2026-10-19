@@ -240,6 +240,22 @@ public class PoemsActionSequence extends AbstractPoemsAction
   }
   
   @Override
+  protected long getActiveSignature()
+  {
+    long signature = 0;
+    
+    for (final AbstractPoemsAction action : this.actions)
+    {
+      if (action.isEnabled())
+      {
+        signature = AbstractPoemsAction.hash(signature, action.getSignature());
+      }
+    }
+    
+    return signature;
+  }
+  
+  @Override
   protected String toActiveString()
   {
     return "N" + this.niche + ": " + Arrays.toString(this.actions);
