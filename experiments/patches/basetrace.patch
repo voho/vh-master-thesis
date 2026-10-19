@@ -1,0 +1,44 @@
+diff -ru a/src/poems/Poems.java b/src/poems/Poems.java
+--- a/src/poems/Poems.java
++++ b/src/poems/Poems.java
+@@ -105,6 +105,7 @@
+       if ((best == null) || temp.isBetter(best))
+       {
+         Logger.improvement(temp, ii);
++        Logger.trace(-temp.getFitness());
+       }
+       
+       // replace old prototype if new better of equal
+diff -ru a/src/program/Benchmark.java b/src/program/Benchmark.java
+--- a/src/program/Benchmark.java
++++ b/src/program/Benchmark.java
+@@ -64,10 +64,13 @@
+ 
+     final Set<Module> modules = Importer.loadProblem(file);
+ 
++    final String trace = System.getProperty("poems.trace");
++    if (trace != null) Logger.startTrace();
+     final long start = System.currentTimeMillis();
+     final Individual result = Poems.solve(modules, i, g, n, s);
+     final long duration = System.currentTimeMillis() - start;
+ 
++    if (trace != null) { try { java.io.File tf = new java.io.File(trace).isDirectory() ? new java.io.File(trace, file.getName().replace(".txt", "") + "_" + Setup.SEED + ".csv") : new java.io.File(trace); java.io.FileWriter w = new java.io.FileWriter(tf); w.write(Logger.getTrace()); w.close(); } catch (java.io.IOException x) { throw new RuntimeException(x); } }
+     final Evaluation evaluation = Evaluator.evaluate(result.getBuildResult());
+     final String valid = Benchmark.validate(modules, result.getBuildResult());
+ 
+diff -ru a/src/program/Logger.java b/src/program/Logger.java
+--- a/src/program/Logger.java
++++ b/src/program/Logger.java
+@@ -234,6 +234,12 @@
+     }
+   }
+   
++  private static StringBuilder traceBuffer = null;
++  private static long traceStart = 0;
++  public static void startTrace() { traceBuffer = new StringBuilder(); traceStart = System.currentTimeMillis(); }
++  public static void trace(final long unusedArea) { if (traceBuffer != null) traceBuffer.append(System.currentTimeMillis() - traceStart).append(',').append(unusedArea).append('\n'); }
++  public static String getTrace() { return traceBuffer == null ? "" : traceBuffer.toString(); }
++  
+   public static void iterated(final Individual temp)
+   {
+     Logger.fitBest.add(Double.valueOf(temp.getFitness()));

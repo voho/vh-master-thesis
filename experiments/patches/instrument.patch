@@ -1,0 +1,78 @@
+diff -ru a/src/poems/optimiser/Population.java b/src/poems/optimiser/Population.java
+--- a/src/poems/optimiser/Population.java
++++ b/src/poems/optimiser/Population.java
+@@ -119,6 +119,15 @@
+    * @param target fitness of the prototype
+    * @return the best individual
+    */
++  public static long cChildren, cIdentity, cDup, cSameFit, cIters, cImproved, cEqual, cWorse; public static java.util.List<Integer> bestGens = new java.util.ArrayList<Integer>();
++  private void stat(final PoemsActionSequence seq, final Individual c, final Individual p1, final Individual p2)
++  {
++    cChildren++;
++    if (c.getFitness() == Integer.MIN_VALUE) cIdentity++;
++    if (c.getFitness() == p1.getFitness() || c.getFitness() == p2.getFitness()) cSameFit++;
++    final long sig = seq.getSignature();
++    for (final Individual i : this.population) { if (i.getSequence().getSignature() == sig && seq.getNiche() == i.getNiche()) { cDup++; break; } }
++  }
+   public Individual evolve(final int generations, final long deadline, final int target)
+   {
+     Population.LOG.log("Starting genetic algorithm with %d generations...", generations);
+@@ -165,8 +174,12 @@
+             mother.getSequence(),
+             father.getSequence());
+         
+-        this.offer(children.getFirst());
+-        this.offer(children.getSecond());
++        final Individual c1 = Individual.create(this.prototype, children.getFirst());
++        final Individual c2 = Individual.create(this.prototype, children.getSecond());
++        this.stat(children.getFirst(), c1, mother, father);
++        this.stat(children.getSecond(), c2, mother, father);
++        this.accept(c1);
++        this.accept(c2);
+       }
+       else
+       {
+@@ -176,9 +189,10 @@
+         
+         final Individual mutant = this.select(low, high);
+         
+-        this.offer(PoemsActionSequence.mutate(
+-            this.prototype.getValue().getLastNumber(),
+-            mutant.getSequence()));
++        final PoemsActionSequence ms = PoemsActionSequence.mutate(this.prototype.getValue().getLastNumber(), mutant.getSequence());
++        final Individual mc = Individual.create(this.prototype, ms);
++        this.stat(ms, mc, mutant, mutant);
++        this.accept(mc);
+       }
+       
+       final Individual newBest = this.pickBest();
+@@ -203,6 +217,8 @@
+     }
+     
+     // return the best solution
++    cIters++; bestGens.add(Integer.valueOf(improved));
++    if (best.getFitness() > target) cImproved++; else if (best.getFitness() == target) cEqual++; else cWorse++;
+     
+     Logger.evolved(this.population, best);
+     
+diff -ru a/src/program/Benchmark.java b/src/program/Benchmark.java
+--- a/src/program/Benchmark.java
++++ b/src/program/Benchmark.java
+@@ -110,6 +110,17 @@
+       writer.close();
+     }
+ 
++    {
++      final java.util.List<Integer> gens = new java.util.ArrayList<Integer>(poems.optimiser.Population.bestGens);
++      java.util.Collections.sort(gens);
++      double mean = 0; for (Integer x : gens) mean += x; mean /= Math.max(1, gens.size());
++      final long c = Math.max(1, poems.optimiser.Population.cChildren); final long it = Math.max(1, poems.optimiser.Population.cIters);
++      System.err.println(String.format(Locale.US, "STAT,%s,%d,%d,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.0f,%d,%.0f",
++        file.getName().replace(".txt", ""), poems.optimiser.Population.cIters, poems.optimiser.Population.cChildren,
++        100.0 * poems.optimiser.Population.cDup / c, 100.0 * poems.optimiser.Population.cIdentity / c, 100.0 * poems.optimiser.Population.cSameFit / c,
++        100.0 * poems.optimiser.Population.cImproved / it, 100.0 * poems.optimiser.Population.cEqual / it, 100.0 * poems.optimiser.Population.cWorse / it,
++        mean, gens.isEmpty() ? 0 : gens.get(gens.size() / 2).intValue(), (double) evaluations / Math.max(1, poems.optimiser.Population.cImproved)));
++    }
+     final Evaluation evaluation = Evaluator.evaluate(placed);
+     final String valid = Benchmark.validate(modules, placed);
+ 
