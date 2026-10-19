@@ -1,0 +1,20 @@
+\begin{table}
+\centering
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Benchmark & Original & Optimised \\
+\midrule
+apte & $0.78_{\pm 0.00}\ (0.78)$ & $0.78_{\pm 0.00}\ (0.78)$ \\
+xerox & $3.41_{\pm 0.58}\ (2.50)$ & $3.07_{\pm 0.41}\ (2.34)$ \\
+hp & $5.23_{\pm 1.05}\ (3.88)$ & $4.43_{\pm 1.08}\ (2.28)$ \\
+ami33 & $4.19_{\pm 0.73}\ (2.91)$ & $\mathbf{2.58_{\pm 0.46}\ (1.73)}$ \\
+ami49 & $4.90_{\pm 0.71}\ (3.70)$ & $\mathbf{3.37_{\pm 0.64}\ (2.31)}$ \\
+n100 & $6.88_{\pm 1.42}\ (5.61)$ & $\mathbf{4.15_{\pm 0.60}\ (3.49)}$ \\
+n200 & $11.97_{\pm 1.15}\ (10.30)$ & $\mathbf{7.30_{\pm 0.47}\ (6.67)}$ \\
+n300 & $13.09_{\pm 1.03}\ (12.02)$ & $\mathbf{9.00_{\pm 0.51}\ (7.99)}$ \\
+\bottomrule
+\end{tabular}
+\caption{Dead space [\%] of the original implementation and of the implementation optimised without changing the results (same algorithm and seeds, 30\,s, 8 seeds)}
+\label{tab:rq1quality}
+\end{table}

@@ -1,100 +1,133 @@
-\chapter{Using of the Program}
+\chapter{Using the Program}
 \label{sec:usage}
 
-\section{Command Line Usage}
+\section{Building}
 
-Program is distributed as a standalone console application that transforms input (problem assignment) into the output (problem solution). As the application is an experimental academic project only, it is aimed to be used by an experienced computer user via the console. Usage was tailored to support benchmarking easily.
-
-The program takes nine arguments and all of them are mandatory. If any argument is missing, program shows usage and exits. Table~\ref{tab:args} contains all the arguments with their descriptions as well as common values for convenience.
-
-The input directory must contain text files with benchmarks in the correct format (see further), the output directory must be writable. For each benchmark file, an output sub directory will be created that will be filled with the results, the statistic and with other information about the computation process. Most of the files created there are meant for testing or benchmarking purposes only. The most important file is the {\tt floorplan.svg}, that shows the final and best result found in the graphical form.
+The program is built by Maven, which also runs the unit tests and creates a runnable archive:
 
 \begin{verbatim}
-run.jar IN OUT VERBOSE R I G N S BESTFIT
-run.jar benchmark/ benchmark/result/ false 1 1000 500 5 50 true
+mvn package
+java -jar target/program.jar
+\end{verbatim}
+
+\section{Command Line}
+
+The program solves every benchmark file found in the input directory and writes the results into a subdirectory of the output directory for each run. The nine mandatory arguments of the original edition are kept (Table~\ref{tab:args}); they can be followed by the optional arguments of Table~\ref{tab:options}. Without the optional arguments, the program runs POEMS with the corrections of Section~\ref{sec:defects}; the modifications evaluated in Chapter~\ref{sec:testing} are switched on by the system properties of Table~\ref{tab:switches}.
+
+\begin{verbatim}
+program.jar IN OUT VERBOSE R I G N S BESTFIT [OPTIONS]
+program.jar benchmark/ benchmark/result/ false 1 1000 500 3 50 true
+program.jar benchmark/ benchmark/result/ false 5 0 0 2 0 true \
+    --algorithm=lapoems --time=60
 \end{verbatim}
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|l|l|l|}
-\hline
-Name & Description & Common value \\
-\hline
-\hline
-{\tt IN} & input directory name & benchmark/ \\
-\hline
-{\tt OUT} & output directory name & benchmark/result/ \\
-\hline
-{\tt VERBOSE} & verbose mode enabled & false \\
-\hline
+\begin{tabularx}{\textwidth}{@{}lXl@{}}
+\toprule
+Name & Description & Example \\
+\midrule
+{\tt IN} & input directory & benchmark/ \\
+{\tt OUT} & output directory & benchmark/result/ \\
+{\tt VERBOSE} & verbose mode & false \\
 {\tt R} & number of runs for each benchmark & 1 \\
-\hline
-{\tt I} & iteration count & 1000 \\
-\hline
-{\tt G} & generation count & 500 \\
-\hline
-{\tt N} & niché count (same as action sequence length) & 5 \\
-\hline
-{\tt S} & niché size (same as number of individuals in niché) & 50 \\
-\hline
-{\tt BESTFIT} & best-fit prototype creation & true \\
-\hline
-\end{tabular}
+{\tt I} & number of iterations & 1000 \\
+{\tt G} & number of generations & 500 \\
+{\tt N} & niche count (length of action sequences; LA-POEMS: maximal number of actions in a step) & 3 \\
+{\tt S} & niche size (number of individuals in a niche) & 50 \\
+{\tt BESTFIT} & best-fit prototype (otherwise complete tree) & true \\
+\bottomrule
+\end{tabularx}
 \end{center}
-\caption{Program command line arguments}
+\caption{Mandatory command line arguments}
 \label{tab:args}
 \end{table}
 
-\section{Benchmark File Format}
+\begin{table}
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Option & Description \\
+\midrule
+{\tt --algorithm=poems|lapoems} & the solver: POEMS (default) or late acceptance POEMS \\
+{\tt --time=SECONDS} & time limit of each run; without it, LA-POEMS makes $I \cdot G$ steps \\
+{\tt --seed=NUMBER} & seed of the random number generator \\
+{\tt --history=LENGTH} & LA-POEMS: late acceptance with this history length (0 = automatic) instead of simulated annealing \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\caption{Optional command line arguments}
+\label{tab:options}
+\end{table}
 
-This section describes how the benchmark files are written. All benchmarks were downloaded from the official website of the free Parquet placer \cite{bench} and the benchmark format was preserved unchanged for convenience.
+For each run, the output directory contains the final floorplan as an SVG image ({\tt floorplan.svg}, and {\tt floorplan\_s.svg} with the tree drawn over it), the tree as a DOT graph, its evaluation, the prototype, and the floorplans of all improvements of POEMS, which can be assembled into an animation.
 
-The benchmark file is a plain text file. The file starts with a single integer specifying the number of modules that are further specified in the file. Then the file continues with a sequence of float pairs split by a space which specifies the dimensions of individual modules. Although the dimensions are - in fact - real, they can be cast to integers, as their fraction parts are equal to zero.
+\section{Benchmark Files}
 
-As an example, the whole MCNC HP benchmark is listed in Fig.~\ref{fig:hpcode}
+A benchmark file is a plain text file that starts with the number of modules, followed by the width and the height of every module (the format of the benchmarks distributed with the floorplanning tools of the University of Michigan \cite{bench}). The dimensions may be written as real numbers, but their fractional parts must be zero. The whole MCNC hp benchmark is shown in Fig.~\ref{fig:hpcode}.
 
 \begin{figure}
 \begin{minipage}{\textwidth}
 \begin{verbatim}
-11 
-1036.00 462.00 
-378.00 700.00 
-980.00 210.00 
-980.00 210.00 
-980.00 210.00 
-3304.00 546.00 
-3304.00 546.00 
-2016.00 252.00 
-3080.00 462.00 
-2016.00 252.00 
-3080.00 462.00 
+11
+1036.00 462.00
+378.00 700.00
+980.00 210.00
+980.00 210.00
+980.00 210.00
+3304.00 546.00
+3304.00 546.00
+2016.00 252.00
+3080.00 462.00
+2016.00 252.00
+3080.00 462.00
 \end{verbatim}
 \end{minipage}
-\caption{HP benchmark plain text code}
+\caption{The MCNC hp benchmark file}
 \label{fig:hpcode}
 \end{figure}
 
-\section{CD Contents}
+\section{Reproducing the Experiments}
 
-The included CD, there is a complete source code for both algorithm implementation and the thesis (for the Table of Contents, please refer to Table~\ref{tab:cd}). Basically, it is an snapshot image of the repository. In case that the CD is lost, source codes can be found on the internet. The website that hosts the complete project repository can be found here \cite{repository}.
+The benchmark runner solves one benchmark with a given seed and time limit (in milliseconds) and prints one line: the benchmark, the seed, the dead space in percent, the unused, total and used area, the width and height, the number of evaluations and iterations, the time, and the result of the validation of the floorplan.
+
+\begin{verbatim}
+java -cp target/program.jar program.Benchmark \
+    benchmark/n100.txt SEED TIME_MS I G N S
+java -cp target/program.jar -Dpoems.algorithm=lapoems \
+    program.Benchmark benchmark/n100.txt SEED TIME_MS 0 0 N L
+\end{verbatim}
+
+For LA-POEMS, {\tt N} is the maximal number of actions in a step and {\tt L} the late acceptance history length, which is used only with {\tt -Dpoems.t0=0} (0 = automatic).
+
+The settings of the improved POEMS and of LA-POEMS that were evaluated in Chapter~\ref{sec:testing} are switched by Java system properties, listed in Table~\ref{tab:switches}. The directory {\tt experiments} of the repository \cite{repository} contains the scripts that ran all experiments of Chapter~\ref{sec:testing}, the raw results of every run, and the scripts that create the tables and figures of this thesis from them.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|l|l|l|}
-\hline
-Name & Description \\
-\hline
-\hline
-{\tt benchmark/} & all collected benchmarks \\
-\hline
-{\tt src/} & program source code \\
-\hline
-{\tt test/} & program unit tests source code \\
-\hline
-{\tt thesis/} & thesis and figures source code \\
-\hline
-\end{tabular}
+\small
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+Property & Default & Meaning \\
+\midrule
+{\tt poems.algorithm} & {\tt poems} & {\tt poems} or {\tt lapoems} \\
+{\tt poems.fast} & true & POEMS: array evaluation (identical results, faster) \\
+{\tt poems.dedupe} & false & POEMS: discard children whose sequence is in the population \\
+{\tt poems.patience} & 0 & POEMS: end an iteration after $P$ generations without improvement (0 = never) \\
+{\tt poems.first} & false & POEMS: end an iteration when the prototype is improved \\
+{\tt poems.lahc} & 0 & POEMS: late acceptance of prototypes with a history of $L$ iterations (0 = off) \\
+{\tt poems.move} & false & POEMS: use the move node action \\
+{\tt poems.t0}, {\tt poems.t1} & $10^{-2}$, $10^{-5}$ & LA-POEMS: initial and final temperature of simulated annealing, relative to the area of the modules ($T_0 = 0$: late acceptance) \\
+{\tt poems.ratio} & 20000 & LA-POEMS: automatic history length = expected steps / $C$ \\
+{\tt poems.restart} & 0 & LA-POEMS: restart after $R \cdot n$ steps without improvement (0 = never) \\
+{\tt poems.local} & 0.5 & LA-POEMS: probability of a local second module \\
+{\tt poems.weights} & uniform & LA-POEMS: relative probabilities of the seven action types \\
+{\tt poems.adaptive} & false & LA-POEMS: adaptive selection of the action types \\
+{\tt poems.trace} & -- & benchmark runner: write the convergence trace into a file or directory \\
+{\tt poems.placement} & -- & benchmark runner: write the final floorplan into a directory \\
+{\tt poems.evaluations} & 0 & benchmark runner, LA-POEMS: stop after this number of steps (0 = time limit only) \\
+\bottomrule
+\end{tabularx}
 \end{center}
-\caption{Included CD disc contents}
-\label{tab:cd}
+\caption{System properties of the experimental settings}
+\label{tab:switches}
 \end{table}

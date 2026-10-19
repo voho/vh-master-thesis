@@ -1,0 +1,21 @@
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+Benchmark & base & $k = 1$ & $k \leq 2$ & weights & restarts & local 0.5 & local 0.25 \\
+\midrule
+xerox & $2.97_{\pm 0.32}$ & $4.70_{\pm 1.46}^{\blacktriangle}$ & $2.93_{\pm 0.45}$ & $2.87_{\pm 0.37}$ & $2.35_{\pm 0.01}$ & $3.09_{\pm 0.72}$ & $3.04_{\pm 0.31}$ \\
+hp & $3.23_{\pm 1.45}$ & $5.14_{\pm 1.24}$ & $3.84_{\pm 1.33}$ & $2.57_{\pm 1.25}$ & $\mathbf{1.32_{\pm 0.00}}$ & $2.33_{\pm 1.08}$ & $3.13_{\pm 1.32}$ \\
+ami33 & $1.43_{\pm 0.34}$ & $2.06_{\pm 0.78}$ & $1.43_{\pm 0.28}$ & $1.70_{\pm 0.56}$ & $1.61_{\pm 0.29}$ & $1.39_{\pm 0.32}$ & $1.60_{\pm 0.42}$ \\
+ami49 & $1.86_{\pm 0.35}$ & $1.92_{\pm 0.27}$ & $1.74_{\pm 0.17}$ & $2.06_{\pm 0.49}$ & $1.86_{\pm 0.35}$ & $2.20_{\pm 0.51}$ & $2.14_{\pm 0.32}$ \\
+n100 & $2.47_{\pm 0.16}$ & $\mathbf{1.91_{\pm 0.27}}$ & $\mathbf{2.18_{\pm 0.12}}$ & $\mathbf{2.22_{\pm 0.21}}$ & $2.63_{\pm 0.23}$ & $2.53_{\pm 0.32}$ & $2.37_{\pm 0.13}$ \\
+n200 & $4.83_{\pm 0.41}$ & $4.48_{\pm 0.29}$ & $4.37_{\pm 0.37}$ & $4.29_{\pm 0.20}$ & $4.83_{\pm 0.41}$ & $4.76_{\pm 0.22}$ & $4.49_{\pm 0.25}$ \\
+n300 & $6.46_{\pm 0.33}$ & $6.18_{\pm 0.39}$ & $6.25_{\pm 0.23}$ & $\mathbf{5.77_{\pm 0.28}}$ & $6.35_{\pm 0.31}$ & $6.31_{\pm 0.22}$ & $6.27_{\pm 0.26}$ \\
+\midrule
+score & 1.277 & 1.460 & 1.246 & 1.219 & 1.110 & 1.247 & 1.294 \\
+\bottomrule
+\end{tabular}
+\caption{Options of LA-POEMS with late acceptance ($L = 1000$): steps of exactly one action and of at most two actions instead of three, weights of the action types favouring flip, rotate, exchange value and move node (3:2:1:3:1:1:2), restarts after $5 \cdot 10^4 n$ steps without improvement, and local partners with the probability 0.5 and 0.25 (dead space [\%], 30\,s, seeds 1--6)}
+\label{tab:rq3lahc}
+\end{table}

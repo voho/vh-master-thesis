@@ -9,6 +9,8 @@ show: pdf
 	$(PDFVIEWER) $(name).pdf
 
 pdf: $(name).tex
+	mkdir -p $(outputdir)
+	$(PDFLATEX) -output-directory $(outputdir) $(name).tex
 	$(PDFLATEX) -output-directory $(outputdir) $(name).tex
 	$(PDFLATEX) -output-directory $(outputdir) $(name).tex
 	cp $(outputdir)/$(name).pdf $(name).pdf

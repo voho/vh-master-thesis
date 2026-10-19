@@ -1,0 +1,21 @@
+\section{RQ1: The Cost of the Implementation}
+\label{sec:rq1}
+
+\paragraph{Placement.} Fig.~\ref{fig:placer} shows the time of one placement of a complete B*-Tree with randomly sized modules. The original contour, a sorted set of all placed modules, is superlinear: 256 times more modules take 3200 times longer, roughly $n^{1.46}$. The original edition measured the same behaviour (Table~5.1 of the original edition shows growth by a factor of 1.9--3.1 per doubling) but concluded that it was close to linear. The array contour is linear, as the analysis of Section~\ref{sec:placement} predicts. Together with the array B*-Tree it is 7 times faster than the original placement for 100 modules and 99 times faster for 25\,600 modules.
+
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{new/placer}
+\caption{Time of one placement of a complete B*-Tree with random module sizes: the original contour, the array contour with the immutable tree, and the array B*-Tree (median of 9 batches after a warm-up; logarithmic axes)}
+\label{fig:placer}
+\end{figure}
+
+\paragraph{Evaluation speed.} Table~\ref{tab:speed} shows how many floorplans per second the algorithms evaluate on the benchmarks. The optimisations of the immutable implementation, which do not change the results, make POEMS 4--8 times faster; the speed-up grows with the number of modules because the original placement is superlinear. The corrections do not change the speed. The array evaluation adds another factor of 1.7 to 3.7, so that POEMS evaluates 7.5 to 29 times more floorplans per second than the original implementation. LA-POEMS, which does not create any objects per step and stops the placement of rejected candidates early, makes 9 to 37 times more evaluations per second than the original implementation, but many of them are only partial placements.
+
+\input{tables/speed}
+
+\paragraph{Quality.} Table~\ref{tab:rq1quality} compares the original implementation with the optimised one. Both run the same algorithm with the same seeds, so the only difference is the number of evaluations made in the 30 seconds. The faster implementation finds significantly better floorplans on all five benchmarks with more than 30 modules; for example, the mean dead space on n300 drops from 13.1\,\% to 9.0\,\%.
+
+\input{tables/rq1_quality}
+
+\paragraph{Answer to RQ1.} Most of the running time of the original implementation was overhead that did not influence the computed results: the superlinear contour, the allocation of temporary lists for every tree traversal and the formatting of discarded messages. Removing it speeds up POEMS 4--8 times with identical results, which translates into significantly better floorplans within the same time on all larger benchmarks. The quality reported for an evolutionary algorithm therefore depends strongly on its implementation, and comparisons with other algorithms must be read with this in mind.

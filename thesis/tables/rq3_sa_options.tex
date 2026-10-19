@@ -1,0 +1,22 @@
+\begin{table}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+Benchmark & base & $k = 1$ & $k \leq 2$ & local & $k \leq 2$, local & adaptive & LA, restarts \\
+\midrule
+xerox & $2.31_{\pm 0.02}$ & $2.35_{\pm 0.06}$ & $2.32_{\pm 0.02}$ & $2.34_{\pm 0.06}$ & $2.33_{\pm 0.02}$ & $2.32_{\pm 0.02}$ & $2.39_{\pm 0.06}^{\blacktriangle}$ \\
+hp & $1.79_{\pm 0.72}$ & $3.66_{\pm 0.74}^{\blacktriangle}$ & $2.20_{\pm 0.98}$ & $1.72_{\pm 0.89}$ & $2.38_{\pm 1.08}$ & $1.72_{\pm 0.89}$ & $1.32_{\pm 0.00}$ \\
+ami33 & $1.74_{\pm 0.41}$ & $1.61_{\pm 0.34}$ & $1.60_{\pm 0.36}$ & $1.65_{\pm 0.55}$ & $1.39_{\pm 0.28}$ & $1.68_{\pm 0.32}$ & $1.65_{\pm 0.11}$ \\
+ami49 & $2.03_{\pm 0.25}$ & $1.72_{\pm 0.26}$ & $1.77_{\pm 0.26}$ & $2.35_{\pm 0.27}$ & $2.23_{\pm 0.29}$ & $2.25_{\pm 0.29}$ & $1.95_{\pm 0.20}$ \\
+n100 & $2.36_{\pm 0.13}$ & $\mathbf{2.05_{\pm 0.18}}$ & $2.42_{\pm 0.20}$ & $2.39_{\pm 0.15}$ & $2.41_{\pm 0.22}$ & $2.63_{\pm 0.26}$ & $2.53_{\pm 0.18}$ \\
+n200 & $3.87_{\pm 0.29}$ & $\mathbf{3.19_{\pm 0.41}}$ & $3.47_{\pm 0.53}$ & $\mathbf{3.37_{\pm 0.28}}$ & $\mathbf{2.98_{\pm 0.50}}$ & $3.58_{\pm 0.40}$ & $4.09_{\pm 0.19}$ \\
+n300 & $4.59_{\pm 0.26}$ & $4.21_{\pm 0.27}$ & $4.56_{\pm 0.39}$ & $4.51_{\pm 0.21}$ & $\mathbf{3.84_{\pm 0.31}}$ & $5.04_{\pm 0.26}^{\blacktriangle}$ & $5.31_{\pm 0.17}^{\blacktriangle}$ \\
+\midrule
+score & 1.200 & 1.213 & 1.182 & 1.187 & 1.157 & 1.225 & 1.183 \\
+\bottomrule
+\end{tabular}
+\caption{Options of LA-POEMS with simulated annealing ($T_0 = 10^{-2}$, $T_1 = 10^{-5}$, steps of at most three actions): steps of exactly one and of at most two actions, local partners with the probability 0.5 (alone and with steps of at most two actions), adaptive selection of the action types, and, for comparison, late acceptance with the automatic history ($C = 4 \cdot 10^4$) and restarts (dead space [\%], 30\,s, seeds 1--6)}
+\label{tab:rq3sa}
+\end{table}

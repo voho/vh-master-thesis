@@ -1,0 +1,17 @@
+\begin{table}
+\centering
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{iterations improving / equal / worse [\%]} & \multicolumn{2}{c}{generation of the best (mean)} \\
+Benchmark & rotation ignored & corrected & rotation ignored & corrected \\
+\midrule
+xerox & 0.4 / 97.8 / 1.8 & 0.4 / 98.0 / 1.5 & 50 & 40 \\
+ami33 & 0.9 / 87.5 / 11.6 & 0.6 / 99.0 / 0.4 & 138 & 23 \\
+n100 & 3.0 / 88.0 / 9.0 & 2.9 / 96.9 / 0.2 & 128 & 24 \\
+n300 & 5.3 / 78.9 / 15.9 & 4.9 / 94.9 / 0.2 & 175 & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Outcome of the iterations of POEMS with the original identity check, which ignores the orientation of the modules, and with the corrected one (20\,s, seed 1)}
+\label{tab:rotation}
+\end{table}

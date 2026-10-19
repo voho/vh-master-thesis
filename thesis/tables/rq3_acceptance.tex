@@ -1,0 +1,23 @@
+\begin{table}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+ & \multicolumn{3}{c}{late acceptance $L$} & \multicolumn{2}{c}{automatic $C$} & \multicolumn{3}{c}{annealing $T_0$} \\
+Benchmark & 1000 & 200 & 5000 & $2{\cdot}10^4$ & $4{\cdot}10^4$ & $10^{-3}$ & $3{\cdot}10^{-3}$ & $10^{-2}$ \\
+\midrule
+xerox & $2.97_{\pm 0.32}$ & $3.13_{\pm 0.68}$ & $2.93_{\pm 0.43}$ & $3.18_{\pm 0.64}$ & $3.18_{\pm 0.64}$ & $2.90_{\pm 0.36}$ & $\mathbf{2.32_{\pm 0.02}}$ & $\mathbf{2.31_{\pm 0.02}}$ \\
+hp & $3.23_{\pm 1.45}$ & $2.66_{\pm 1.34}$ & $3.09_{\pm 1.27}$ & $\mathbf{1.32_{\pm 0.00}}$ & $\mathbf{1.32_{\pm 0.00}}$ & $3.10_{\pm 1.30}$ & $2.97_{\pm 1.17}$ & $1.79_{\pm 0.72}$ \\
+ami33 & $1.43_{\pm 0.34}$ & $1.57_{\pm 0.40}$ & $1.54_{\pm 0.27}$ & $1.46_{\pm 0.30}$ & $1.59_{\pm 0.25}$ & $1.54_{\pm 0.27}$ & $1.79_{\pm 0.48}$ & $1.74_{\pm 0.41}$ \\
+ami49 & $1.86_{\pm 0.35}$ & $1.96_{\pm 0.15}$ & $1.79_{\pm 0.23}$ & $1.88_{\pm 0.28}$ & $1.96_{\pm 0.18}$ & $1.77_{\pm 0.28}$ & $2.13_{\pm 0.26}$ & $2.03_{\pm 0.25}$ \\
+n100 & $2.47_{\pm 0.16}$ & $2.48_{\pm 0.10}$ & $2.72_{\pm 0.12}^{\blacktriangle}$ & $2.37_{\pm 0.11}$ & $2.44_{\pm 0.23}$ & $2.30_{\pm 0.21}$ & $2.34_{\pm 0.27}$ & $2.36_{\pm 0.13}$ \\
+n200 & $4.83_{\pm 0.41}$ & $\mathbf{4.16_{\pm 0.26}}$ & $7.36_{\pm 0.25}^{\blacktriangle}$ & $4.38_{\pm 0.23}$ & $\mathbf{4.03_{\pm 0.22}}$ & $\mathbf{4.11_{\pm 0.35}}$ & $\mathbf{4.11_{\pm 0.34}}$ & $\mathbf{3.87_{\pm 0.29}}$ \\
+n300 & $6.46_{\pm 0.33}$ & $\mathbf{5.17_{\pm 0.20}}$ & $9.54_{\pm 0.46}^{\blacktriangle}$ & $\mathbf{5.55_{\pm 0.31}}$ & $\mathbf{5.22_{\pm 0.09}}$ & $\mathbf{5.45_{\pm 0.18}}$ & $\mathbf{5.31_{\pm 0.35}}$ & $\mathbf{4.59_{\pm 0.26}}$ \\
+\midrule
+score & 1.299 & 1.232 & 1.473 & 1.112 & 1.113 & 1.219 & 1.229 & 1.099 \\
+\bottomrule
+\end{tabular}
+\caption{Acceptance criteria of LA-POEMS: late acceptance with a fixed history length $L$ or with the automatic length (ratio $C$), and simulated annealing with the initial temperature $T_0$ relative to the area of the modules (final temperature $10^{-6}$, or $10^{-5}$ for $T_0 = 10^{-2}$); steps of at most three actions (dead space [\%], 30\,s, seeds 1--6)}
+\label{tab:rq3acceptance}
+\end{table}

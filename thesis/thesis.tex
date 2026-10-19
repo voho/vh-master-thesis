@@ -4,11 +4,20 @@
 \documentclass[11pt,twoside,a4paper]{book}
 \usepackage[a4paper,width=15cm,height=23cm,twoside]{geometry}
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage[utf8]{inputenc}
-\usepackage[usenames,dvipsnames]{color}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{graphicx}
 \usepackage{subfig}
 \captionsetup{labelfont={bf},margin=8pt,captionskip=13pt}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
 \usepackage[czech,english]{babel}
 \usepackage[calcwidth]{titlesec}
 \titleformat{\chapter}[display]{\normalfont\bf}{\titlerule[1pt]\vspace{1pt}\titlerule\vspace{1pc}\Huge\MakeUppercase{\chaptertitlename} \thechapter}{1pc}{\titlerule\vspace{1pc}\Huge}
@@ -22,14 +31,14 @@
   columns=fullflexible,
   language=Java,
   numbers=left,
-  frame=leftline, 
+  frame=leftline,
   rulesepcolor=\color{Gray},
   basicstyle=\small,
   numberstyle=\sc\footnotesize\color{Gray},
   commentstyle=\it\footnotesize\color{Gray}
 }
 \usepackage[
-  pdftitle={Master's Thesis},
+  pdftitle={Optimisation of Rectangular Shapes Placement by Means of Evolutionary Algorithms},
   pdfauthor={Bc.~Vojtěch~Hordějčuk},
   bookmarks=true,
   colorlinks=true,
@@ -38,6 +47,7 @@
   linkcolor=black,
   unicode=true
 ]{hyperref}
+\usepackage{url}
 \pagestyle{empty}
 \setlength{\columnsep}{5pt}
 \linespread{1.1}
@@ -48,7 +58,14 @@
 \def\MakeUppercase#1{{\it #1}}
 \graphicspath{{figures//}}
 
+% placeholder for numbers that are not known yet (must not remain in the final text)
+\newcommand{\TBD}[1]{\textcolor{red}{[TBD: #1]}}
+% names of the algorithms
+\newcommand{\poems}{POEMS}
+\newcommand{\lapoems}{LA-POEMS}
+
 \begin{document}
+\pagenumbering{roman}
 
 % Titulní stránka
 % ===============
@@ -89,7 +106,8 @@ by Means of Evolutionary Algorithms}
 
 \vfill
 
-\today
+Prague, 2011 \\
+{\small Revised edition, 2026}
 
 \end{center}
 
@@ -108,10 +126,13 @@ My supervisor, Mr.~Ing.~Jiří~Kubalík~Ph.D., for valuable advice and research 
 I hereby declare that I have completed this thesis independently and that I have listed all the literature and publications used within the research and work. I have no objections to usage of this work in compliance with Act~No~121/2000 Sb. (the Copyright~Act), as amended, and in compliance with copyright-related rights currently in force.
 
 \bigskip
-\bigskip
 
 \noindent
-Prague, \today \hfill \hbox to 70mm{\tiny\dotfill}
+Prague, 2011 \hfill \hbox to 70mm{\tiny\dotfill}
+
+\bigskip
+
+{\small \noindent {\bf Note on the revised edition.} The statement above refers to the original edition of 2011, which is preserved in the history of the project repository. This revised edition (2026) was prepared at the author's request with the help of the AI assistant Claude (Anthropic). The revision consists of corrections of defects found in the original implementation, a faster implementation, improvements of the original algorithm, a new algorithm (late acceptance POEMS, Chapter~\ref{sec:approach}), all experiments of Chapter~\ref{sec:testing}, which were re-run from scratch with a new methodology, and a rewritten text. The results of the original edition are cited where they are compared.}
 
 % Abstrakt
 % ========
@@ -121,16 +142,21 @@ Prague, \today \hfill \hbox to 70mm{\tiny\dotfill}
 
 \section*{Abstract}
 
-The aim of this work is to design and test an evolutionary algorithm that is capable of placing rectangular shapes onto the plane that the rectangle containing all modules is as small as possible. Under this modelling, real problems are considered, such as VLSI chip floorplanning, simple task planning or civil engineering. An evolutionary algorithm is used to optimise the floorplan represented as a tree (B*-Tree).
+The thesis studies the placement of rotatable rectangles in the plane so that the enclosing rectangle is as small as possible, a model of VLSI floorplanning. Floorplans are represented by B*-Trees and optimised by POEMS, an iterative algorithm in which a genetic algorithm evolves short sequences of tree modifications (actions) that improve the current solution (the prototype). A critical re-examination of the original implementation found that most of its running time was spent on avoidable overhead, that several defects changed the behaviour of the algorithm (for example, modules could never be rotated alone), and that the genetic algorithm spent most of its evaluations on duplicates and on generations after the best step of the iteration had already been found. An amortised linear placement and an array-based B*-Tree with in-place actions make the evaluation 7.5 to 29 times faster without changing the results. Building on these findings, the thesis proposes {\em late acceptance POEMS} (LA-POEMS), which applies random POEMS action sequences immediately and accepts them by simulated annealing or late acceptance. In experiments with equal time budgets, new random seeds, held-out instances and non-parametric tests on the MCNC and GSRC benchmarks, LA-POEMS reduces the dead space of the original algorithm by 57--73\,\% within one minute on instances with 33 to 300 modules and is significantly better than an improved POEMS on most instances. Its results are as good as or better than those of the original edition after up to 2.5 hours of computation and the published results of the CompaSS packer.
 
 \section*{Abstrakt}
 
-Cílem práce bylo navrhnout a otestovat evoluční algoritmus, který bude schopný rozmístit obdélníkové útvary na plochu tak, aby celková plocha obdélníku, který tyto útvary ohraničuje, byla co nejmenší. Úlohou je možné modelovat různé problémy reálného světa - například rozmisťování funkčních bloků na VLSI čip (tzv. floorplanning), jednoduché plánování či urbanistiku. K optimalizaci je použit iterativní evoluční algoritmus, pracující se stromovou reprezentací (B*-Tree).
+Práce se zabývá rozmístěním otočitelných obdélníků v rovině tak, aby obdélník, který je ohraničuje, byl co nejmenší, což je model rozmisťování bloků na čipu (floorplanning). Rozmístění je reprezentováno stromem B*-Tree a optimalizováno algoritmem POEMS, iterativním algoritmem, ve kterém genetický algoritmus hledá krátké posloupnosti úprav stromu (akcí), jež zlepšují aktuální řešení (prototyp). Kritický rozbor původní implementace ukázal, že většinu času běhu spotřebovala zbytečná režie, že několik chyb měnilo chování algoritmu (například moduly nebylo možné samostatně otočit) a že genetický algoritmus většinu vyhodnocení věnoval duplicitním jedincům a generacím, ve kterých už byl nejlepší krok iterace nalezen. Rozmisťování v amortizovaně lineárním čase a reprezentace stromu v polích s akcemi prováděnými na místě zrychlují vyhodnocení 7,5krát až 29krát, aniž by se změnily výsledky. Na základě těchto zjištění práce navrhuje {\em POEMS s pozdním přijetím} (late acceptance POEMS, LA-POEMS), který náhodné posloupnosti akcí aplikuje okamžitě a přijímá je pomocí simulovaného žíhání nebo pozdního přijetí. V experimentech se stejným časovým limitem, novými semínky náhodného generátoru, úlohami nepoužitými při ladění a neparametrickými testy na testovacích úlohách MCNC a GSRC snižuje LA-POEMS během jedné minuty nevyužitou plochu původního algoritmu o 57 až 73\,\% na úlohách s 33 až 300 moduly a na většině úloh je významně lepší než vylepšený POEMS. Jeho výsledky jsou stejně dobré nebo lepší než výsledky původní verze práce po až 2,5 hodinách výpočtu i publikované výsledky nástroje CompaSS.
 
 % Obsah
 % =====
 
+\cleardoublepage
 \tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+\listoftables
 
 % Kapitoly
 % ========
@@ -145,14 +171,10 @@ Cílem práce bylo navrhnout a otestovat evoluční algoritmus, který bude scho
 \include{3_approach}
 \include{4_implementation}
 \include{5_experiments}
-\include{6_userguide}
-\include{7_bibliography}
-
-% Seznamy obrázků a tabulek
-% =========================
-
-\listoffigures
-\listoftables
+\include{6_conclusions}
+\appendix
+\include{7_userguide}
+\include{8_bibliography}
 
 % Konec dokumentu
 % ===============
