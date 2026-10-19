@@ -210,7 +210,7 @@ public class Population
    */
   private void replaceWorse(final Individual fresh)
   {
-    Population.LOG.log("Replacing worse by %s...", fresh.toString());
+    Population.LOG.log("Replacing worse by %s...", fresh);
     
     for (int i = 0; i <= Population.getNicheHigh(fresh.getNiche(), this.nicheSize); i++)
     {
@@ -307,8 +307,8 @@ public class Population
       return null;
     }
     
-    Population.LOG.log("Best individual found: %s", best.toString());
-    Population.LOG.log("Best fitness: " + best.getFitness());
+    Population.LOG.log("Best individual found: %s", best);
+    Population.LOG.log("Best fitness: %d", Integer.valueOf(best.getFitness()));
     
     return best;
   }

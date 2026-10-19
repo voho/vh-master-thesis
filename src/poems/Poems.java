@@ -96,7 +96,7 @@ final public class Poems
       
       final Individual temp = population.evolve(g, deadline);
       
-      Poems.LOG.log("Iteration %d brought: %s", ii, temp.toString());
+      Poems.LOG.log("Iteration %d brought: %s", ii, temp);
       
       // print new prototype if better
       

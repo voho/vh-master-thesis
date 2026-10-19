@@ -135,7 +135,7 @@ public class Utility
    */
   private static void shuffleArray(final Object[] array, final int shakes)
   {
-    Utility.LOG.log("Shuffling array: " + Arrays.toString(array));
+    Utility.LOG.log("Shuffling array: %s", Arrays.asList(array));
     
     int remains = 0;
     
@@ -169,7 +169,7 @@ public class Utility
       }
     }
     
-    Utility.LOG.log("Shuffled array: " + Arrays.toString(array));
+    Utility.LOG.log("Shuffled array: %s", Arrays.asList(array));
   }
   
   /**

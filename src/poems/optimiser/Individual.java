@@ -34,9 +34,9 @@ public class Individual
    */
   private final BTree<NumberedValue<Module>> buildPlan;
   /**
-   * B*-Tree of placed modules
+   * B*-Tree of placed modules (created on demand)
    */
-  private final BTree<PlacedModule> buildResult;
+  private BTree<PlacedModule> buildResult;
   /**
    * fitness value
    */
@@ -122,13 +122,13 @@ public class Individual
     
     this.buildPlan = modified;
     
-    // place modules
+    // the modules are placed on demand
     
-    this.buildResult = Placer.placeNumbered(modified);
+    this.buildResult = null;
     
     // compute fitness
     
-    this.fitness = Individual.evaluateFitness(original, this.buildPlan, this.buildResult);
+    this.fitness = Individual.evaluateFitness(original, this.buildPlan);
     
     Individual.evaluations++;
   }
@@ -148,32 +148,20 @@ public class Individual
    * 
    * @param original original B*-Tree
    * @param modified modified B*-Tree
-   * @param placed placed B*-Tree
    * @return fitness value
    */
-  private static int evaluateFitness(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified, final BTree<PlacedModule> placed)
+  private static int evaluateFitness(final BTree<NumberedValue<Module>> original, final BTree<NumberedValue<Module>> modified)
   {
     if (Evaluator.equals(modified, original))
     {
       Individual.LOG.log("Equality of input and output trees, minimal fitness returned.");
-      Individual.LOG.log("Original: %s", original.toString());
-      Individual.LOG.log("Modified: %s", modified.toString());
+      Individual.LOG.log("Original: %s", original);
+      Individual.LOG.log("Modified: %s", modified);
       
       return Integer.MIN_VALUE;
     }
     
-    return Individual.evaluateFitness(placed);
-  }
-  
-  /**
-   * Evaluates a solution fitness.
-   * 
-   * @param placed placed B*-Tree
-   * @return fitness value
-   */
-  private static int evaluateFitness(final BTree<PlacedModule> placed)
-  {
-    return Evaluator.evaluate(placed).getFitness();
+    return Placer.measureNumbered(modified).getFitness();
   }
   
   /**
@@ -203,6 +191,11 @@ public class Individual
    */
   public BTree<PlacedModule> getBuildResult()
   {
+    if (this.buildResult == null)
+    {
+      this.buildResult = Placer.placeNumbered(this.buildPlan);
+    }
+    
     return this.buildResult;
   }
   

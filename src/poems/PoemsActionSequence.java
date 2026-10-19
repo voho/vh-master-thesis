@@ -197,7 +197,7 @@ public class PoemsActionSequence extends AbstractPoemsAction
   {
     super(true);
     
-    PoemsActionSequence.LOG.log("Creating a new sequence: %s", newActions.toString());
+    PoemsActionSequence.LOG.log("Creating a new sequence: %s", Arrays.asList(newActions));
     
     // save the action array
     
