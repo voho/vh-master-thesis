@@ -124,6 +124,13 @@ public class Utility
    */
   public static void shuffleArray(final Object[] array)
   {
+    if (array.length < 2)
+    {
+      // nothing to shuffle (and no two different indices to swap)
+      
+      return;
+    }
+    
     Utility.shuffleArray(array, Utility.random(1, array.length));
   }
   

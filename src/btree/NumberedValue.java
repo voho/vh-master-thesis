@@ -118,7 +118,9 @@ public class NumberedValue<V> implements BTreeValue
   @Override
   public int hashCode()
   {
-    return super.hashCode();
+    // consistent with equals (values with the same number are equal)
+    
+    return this.number;
   }
   
   @Override

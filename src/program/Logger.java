@@ -292,19 +292,17 @@ final public class Logger
   
   public static void evolved(final Individual[] population, final Individual best)
   {
-    Double avg = null;
+    double sum = 0;
+    int count = 0;
     
     for (final Individual i : population)
     {
-      // compute avg
+      // compute avg (individuals equal to the prototype are not counted)
       
-      if (avg == null)
+      if (i.getFitness() > Integer.MIN_VALUE)
       {
-        avg = Double.valueOf(i.getFitness());
-      }
-      else
-      {
-        avg = (avg + i.getFitness()) / 2.0;
+        sum += i.getFitness();
+        count++;
       }
       
       // increment actions
@@ -398,7 +396,9 @@ final public class Logger
       }
     }
     
-    Logger.fitAverage.add(avg);
+    Logger.fitAverage.add(Double.valueOf((count > 0)
+        ? sum / count
+        : 0));
   }
   
   public void created(final AbstractPoemsAction action)
