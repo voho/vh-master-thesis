@@ -12,10 +12,12 @@ import java.util.Set;
 import module.Module;
 import module.PlacedModule;
 import poems.Poems;
+import poems.hybrid.LatePoems;
 import poems.optimiser.Individual;
 import btree.BTree;
 import btree.utility.Evaluation;
 import btree.utility.Evaluator;
+import btree.utility.Placer;
 
 /**
  * Headless benchmark runner used for experiments. Solves a single problem
@@ -65,11 +67,31 @@ public class Benchmark
     final Set<Module> modules = Importer.loadProblem(file);
 
     final long start = System.currentTimeMillis();
-    final Individual result = Poems.solve(modules, i, g, n, s);
+    final BTree<PlacedModule> placed;
+    final long evaluations;
+    final int iterations;
+
+    if ("lahc".equals(System.getProperty("poems.algorithm")))
+    {
+      // late acceptance POEMS: N = maximal number of actions in one step,
+      // S = late acceptance history length
+
+      placed = Placer.placeNumbered(LatePoems.solve(modules, Setup.TIME_LIMIT, 0, n, s));
+      evaluations = LatePoems.getEvaluations();
+      iterations = 0;
+    }
+    else
+    {
+      final Individual result = Poems.solve(modules, i, g, n, s);
+      placed = result.getBuildResult();
+      evaluations = Individual.getEvaluations();
+      iterations = Poems.getIterations();
+    }
+
     final long duration = System.currentTimeMillis() - start;
 
-    final Evaluation evaluation = Evaluator.evaluate(result.getBuildResult());
-    final String valid = Benchmark.validate(modules, result.getBuildResult());
+    final Evaluation evaluation = Evaluator.evaluate(placed);
+    final String valid = Benchmark.validate(modules, placed);
 
     System.out.println(String.format(
         Locale.US,
@@ -82,8 +104,8 @@ public class Benchmark
         evaluation.getUsedArea(),
         evaluation.getWidth(),
         evaluation.getHeight(),
-        Individual.getEvaluations(),
-        Poems.getIterations(),
+        evaluations,
+        iterations,
         duration,
         valid));
   }
