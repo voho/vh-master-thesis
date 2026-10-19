@@ -16,6 +16,7 @@ import poems.action2.MirrorPoemsAction;
 import poems.action3.HangNodePoemsAction;
 import poems.action3.MoveNodePoemsAction;
 import poems.optimiser.Individual;
+import btree.ArrayBTree;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Evaluator;
@@ -242,6 +243,34 @@ final public class Logger
     try
     {
       Exporter.treeToSvg(best.getBuildResult(), false, new File(Logger.dirOutput, String.format("i_%08d.svg", i)));
+    }
+    catch (final IOException x)
+    {
+      x.printStackTrace();
+      System.exit(-1);
+    }
+  }
+  
+  /**
+   * Exports an improvement of the best solution of the late acceptance POEMS
+   * (like the improvements of POEMS, the files are the frames of an
+   * animation).
+   * 
+   * @param best the best solution
+   * @param i number of the improvement
+   */
+  public static void improvement(final ArrayBTree best, final int i)
+  {
+    if (!Setup.EXPORT || (Logger.dirOutput == null))
+    {
+      // exports disabled or no run started
+      
+      return;
+    }
+    
+    try
+    {
+      Exporter.treeToSvg(Placer.placeNumbered(best.toBTree()), false, new File(Logger.dirOutput, String.format("i_%08d.svg", i)));
     }
     catch (final IOException x)
     {

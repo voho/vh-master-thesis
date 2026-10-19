@@ -133,7 +133,7 @@ public final class LatePoems
     Arrays.fill(history, currentArea);
 
     final long begin = System.currentTimeMillis();
-    final long deadline = begin + timeLimit;
+    final long deadline = (timeLimit > 0) ? (begin + timeLimit) : Long.MAX_VALUE;
     final int last = current.size() - 1;
     final boolean annealing = (Setup.ANNEALING_START > 0);
     final double used = Placer.measureNumbered(prototype).getUsedArea();
@@ -143,6 +143,7 @@ public final class LatePoems
     int slot = 0;
 
     LatePoems.evaluations = 1;
+    int improvements = 0;
 
     // action types of the current step (and their success statistics)
 
@@ -230,6 +231,7 @@ public final class LatePoems
           best.copyFrom(current);
           bestArea = area;
           Logger.trace((long) (area - used));
+          Logger.improvement(best, ++improvements);
         }
 
         if (area < runBestArea)
