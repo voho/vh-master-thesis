@@ -76,7 +76,7 @@ public class Benchmark
       // late acceptance POEMS: N = maximal number of actions in one step,
       // S = late acceptance history length
 
-      placed = Placer.placeNumbered(LatePoems.solve(modules, Setup.TIME_LIMIT, 0, n, s));
+      placed = Placer.placeNumbered(LatePoems.solve(modules, Setup.TIME_LIMIT, Long.getLong("poems.evaluations", 0).longValue(), n, s));
       evaluations = LatePoems.getEvaluations();
       iterations = 0;
     }

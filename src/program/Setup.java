@@ -54,6 +54,23 @@ public class Setup
    * better or equal prototypes are accepted)
    */
   public static final int LATE_ACCEPTANCE = Integer.getInteger("poems.lahc", 0).intValue();
+  /**
+   * relative weights of the action types used by the late acceptance POEMS
+   * (flip, rotate, mirror, exchange value, exchange node, hang node, move
+   * node), NULL = all types are equally likely
+   */
+  public static final double[] ACTION_WEIGHTS = Setup.weights("poems.weights");
+  /**
+   * initial temperature of the simulated annealing used by the late
+   * acceptance POEMS instead of the late acceptance (relative to the area of
+   * all modules, 0 = late acceptance is used)
+   */
+  public static final double ANNEALING_START = Double.parseDouble(System.getProperty("poems.t0", "0"));
+  /**
+   * final temperature of the simulated annealing (relative to the area of all
+   * modules)
+   */
+  public static final double ANNEALING_END = Double.parseDouble(System.getProperty("poems.t1", "0.000001"));
   
   // MUTABLE PARAMETERS
   // ==================
@@ -115,6 +132,40 @@ public class Setup
     // NOP
   }
   
+  /**
+   * Reads comma separated weights from a system property and normalizes them
+   * to sum to one.
+   *
+   * @param name property name
+   * @return normalized weights or NULL if the property is not set
+   */
+  private static double[] weights(final String name)
+  {
+    final String value = System.getProperty(name);
+
+    if (value == null)
+    {
+      return null;
+    }
+
+    final String[] parts = value.split(",");
+    final double[] result = new double[parts.length];
+    double sum = 0;
+
+    for (int i = 0; i < parts.length; i++)
+    {
+      result[i] = Double.parseDouble(parts[i].trim());
+      sum += result[i];
+    }
+
+    for (int i = 0; i < parts.length; i++)
+    {
+      result[i] /= sum;
+    }
+
+    return result;
+  }
+
   /**
    * Reads a Boolean system property.
    * 

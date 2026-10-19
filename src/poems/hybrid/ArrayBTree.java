@@ -254,6 +254,21 @@ public final class ArrayBTree
    */
   public long place()
   {
+    return this.place(Long.MAX_VALUE);
+  }
+
+  /**
+   * Places the modules (B*-Tree packing using the contour) and returns the
+   * area of the enclosing rectangle. As the enclosing rectangle only grows
+   * during the placement, the placement is stopped as soon as its area
+   * exceeds the limit (then the returned area is greater than the limit, but
+   * it is not the final area and the floorplan size is not valid).
+   *
+   * @param limit area limit
+   * @return the total floorplan area (or any area greater than the limit)
+   */
+  public long place(final long limit)
+  {
     // one infinite segment at the ground level
 
     this.start[0] = 0;
@@ -336,6 +351,11 @@ public final class ArrayBTree
       if (y + h > maxY)
       {
         maxY = y + h;
+      }
+
+      if ((long) maxX * (long) maxY > limit)
+      {
+        return (long) maxX * (long) maxY;
       }
 
       // the right child is placed above (starts at the same segment), the left

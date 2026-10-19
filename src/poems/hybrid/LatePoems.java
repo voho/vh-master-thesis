@@ -5,10 +5,12 @@ import java.util.Set;
 
 import module.Module;
 import program.Logger;
+import program.Setup;
 import program.Utility;
 import btree.BTree;
 import btree.NumberedValue;
 import btree.utility.Numberator;
+import btree.utility.Placer;
 import btree.utility.Prototyper;
 
 /**
@@ -71,17 +73,37 @@ public final class LatePoems
     final long[] history = new long[historyLength];
     Arrays.fill(history, currentArea);
 
-    final long deadline = System.currentTimeMillis() + timeLimit;
+    final long begin = System.currentTimeMillis();
+    final long deadline = begin + timeLimit;
     final int last = current.size() - 1;
+    final boolean annealing = (Setup.ANNEALING_START > 0);
+    final double used = Placer.measureNumbered(prototype).getUsedArea();
+    double temperature = Setup.ANNEALING_START * used;
     int slot = 0;
 
     LatePoems.evaluations = 1;
 
     while ((maxEvaluations <= 0) || (LatePoems.evaluations < maxEvaluations))
     {
-      if (((LatePoems.evaluations & 0xFF) == 0) && (System.currentTimeMillis() >= deadline))
+      if ((LatePoems.evaluations & 0xFF) == 0)
       {
-        break;
+        final long now = System.currentTimeMillis();
+
+        if (now >= deadline)
+        {
+          break;
+        }
+
+        if (annealing)
+        {
+          // exponential cooling from the initial to the final temperature
+
+          final double progress = (maxEvaluations > 0)
+              ? (double) LatePoems.evaluations / (double) maxEvaluations
+              : (double) (now - begin) / (double) timeLimit;
+
+          temperature = used * Setup.ANNEALING_START * Math.pow(Setup.ANNEALING_END / Setup.ANNEALING_START, progress);
+        }
       }
 
       // modify the prototype by a random action sequence
@@ -95,13 +117,19 @@ public final class LatePoems
         LatePoems.applyRandomAction(candidate, last);
       }
 
-      final long area = candidate.place();
+      // the candidate is accepted if its area does not exceed the threshold:
+      // late acceptance = not worse than now or the given number of steps ago,
+      // annealing = worse by D with the probability exp(-D / temperature)
+
+      final long threshold = annealing
+          ? currentArea + (long) (-Math.log(1.0 - Utility.randomDouble()) * temperature)
+          : Math.max(currentArea, history[slot]);
+
+      final long area = candidate.place(threshold);
 
       LatePoems.evaluations++;
 
-      // late acceptance
-
-      if ((area <= currentArea) || (area <= history[slot]))
+      if (area <= threshold)
       {
         final ArrayBTree temp = current;
         current = candidate;
@@ -142,7 +170,7 @@ public final class LatePoems
         : a;
     final boolean flag = Utility.randomBoolean();
 
-    switch (Utility.random(0, LatePoems.ACTION_TYPES - 1))
+    switch (LatePoems.randomActionType())
     {
     case 0:
       tree.flip(a, flag);
@@ -166,6 +194,33 @@ public final class LatePoems
       tree.move(a, b, flag);
       break;
     }
+  }
+
+  /**
+   * Returns a random action type, uniformly or by the configured weights.
+   *
+   * @return action type
+   */
+  private static int randomActionType()
+  {
+    if (Setup.ACTION_WEIGHTS == null)
+    {
+      return Utility.random(0, LatePoems.ACTION_TYPES - 1);
+    }
+
+    double r = Utility.randomDouble();
+
+    for (int type = 0; type < LatePoems.ACTION_TYPES - 1; type++)
+    {
+      r -= Setup.ACTION_WEIGHTS[type];
+
+      if (r < 0)
+      {
+        return type;
+      }
+    }
+
+    return LatePoems.ACTION_TYPES - 1;
   }
 
   /**
